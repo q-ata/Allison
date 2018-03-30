@@ -4,32 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import engine.Convex;
-import engine.Sprite;
 import engine.Vec2;
 
 /**
  * Provides methods to check for collisions between 2 convex 2D polygons.
  */
-public final class GJK {
-  /**
-   * Check whether or not 2 sprites intersect.
-   * @param a The first sprite to check.
-   * @param b The second sprite to check.
-   * @return Whether or not the sprites are intersecting.
-   */
-  public static boolean spriteIntersects(Sprite a, Sprite b) {
-    a.setHitboxes(a.getHitboxes().clone());
-    b.setHitboxes(b.getHitboxes().clone());
-    for (int i = 0; i < a.getHitboxes().length; i++) {
-      Convex box1 = a.getHitboxes()[i];
-      for (int j = 0; j < b.getHitboxes().length; j++) {
-        if (intersects(box1, b.getHitboxes()[j])) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+public class GJK {
   
   /**
    * Check whether or not 2 convex polygons intersect.

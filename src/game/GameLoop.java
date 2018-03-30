@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import engine.GameProcess;
 import engine.KeyboardInputs;
 import engine.Vec2;
-import engine.collision.GJK;
 import game.blocks.BasicRock;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -28,7 +27,6 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   
   @Override
   public void input() {
-    
     MapItem main = mapItems.get(0);
     boolean advance = true;
     if (KeyboardInputs.KEYMAP.get(KeyCode.W)) {
@@ -66,7 +64,6 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
       main.setMoving(false);
       main.setVel(new Vec2());
     }
-    
   }
 
   @Override
@@ -75,51 +72,12 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     for (int i = 0; i < mapItems().size(); i++) {
       MapItem item = mapItems().get(i);
       if (item.vel().x() != 0 || item.vel().y() != 0) {
-        item.move(item.vel());
-        for (int q = 0; q < mapItems().size(); q++) {
-          if (q == i) {
-            continue;
-          }
-          MapItem testAgainst = mapItems.get(q);
-          boolean collision = GJK.spriteIntersects(item.getCurrentSprite(), testAgainst.getCurrentSprite());
-          CollisionData currentData = new CollisionData(item.dir(), i);
-          CollisionData processed = item.touchedIncludes(currentData);
-          if (collision) {
-            if (processed != null && processed.dir() == item.dir()) {
-              item.move(item.vel().clone().negate());
-              continue;
-            }
-            else if (processed == null) {
-              item.getTouched().add(currentData);
-            }
-          }
-          else if (processed != null && !item.getTouched().remove(processed)) {
-            System.out.println("Failed to remove collision data.");
-          }
-        }
+        // TODO: Collision logic.
+        item.getHitbox().move(item.vel());
+        item.pos().add(item.vel());
+        item.getHitbox().move(item.vel());
       }
     }
-    /*
-    for (int i = 1; i < mapItems().size(); i++) {
-      
-      MapItem item =  mapItems().get(i);
-      CollisionData currentColData = new CollisionData(INSTANCE.getPlayer().dir(), i);
-      boolean processed = INSTANCE.getPlayer().touchedIncludes(currentColData);
-      if (GJK.spriteIntersects(INSTANCE.getPlayer().getCurrentSprite(), item.getCurrentSprite())) {
-        if (processed) {
-          continue;
-        }
-        mapItems().get(0).move(mapItems().get(0).vel().clone().negate());
-        mapItems().get(0).getTouched().add(currentColData);
-      }
-      else if (processed) {
-        if (!INSTANCE.getPlayer().getTouched().remove(currentColData)) {
-          System.out.println("Failed to remove collision data.");
-        };
-      }
-        
-    }
-    */
     
   }
 
@@ -137,8 +95,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
       if (!(item.isNeedMoving() && !item.isMoving())) {
         seq.advanceAnimationTimer();
       }
-      
-      INSTANCE.gc().drawImage(seq.getSprite().getSource(), item.pos().x(), item.pos().y());
+      INSTANCE.gc().drawImage(seq.getSprite(), item.pos().x(), item.pos().y());
     }
     
   }

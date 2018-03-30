@@ -1,11 +1,10 @@
 package game;
 
-import engine.Sprite;
-import engine.Vec2;
+import javafx.scene.image.Image;
 
 public class AnimationSequence {
   
-  private Sprite[] sprites;
+  private Image[] sprites;
   private boolean animated = true;
   private final int FRAMEDURATION;
   private int frameTime = 0;
@@ -14,21 +13,21 @@ public class AnimationSequence {
   private Direction dir;
   
   // New animation sequence using the given sprites, duration of each frame, and direction.
-  public AnimationSequence(Sprite[] sprites, int frameDuration, Direction dir) {
+  public AnimationSequence(Image[] sprites, int frameDuration, Direction dir) {
     setSprites(sprites);
     FRAMEDURATION = frameDuration;
     setDir(dir);
   }
   
   // New animation sequence using the given sprites, default duration of each frame (15), and direction.
-  public AnimationSequence(Sprite[] sprites, Direction dir) {
+  public AnimationSequence(Image[] sprites, Direction dir) {
     setSprites(sprites);
     FRAMEDURATION = 15;
     setDir(dir);
   }
   
   // New animation sequence with no animations.
-  public AnimationSequence(Sprite[] sprites) {
+  public AnimationSequence(Image[] sprites) {
     setSprites(sprites);
     setAnimated(false);
     FRAMEDURATION = 0;
@@ -45,7 +44,7 @@ public class AnimationSequence {
   }
   */
   
-  public Sprite getSprite() {
+  public Image getSprite() {
     return getSprites()[currentFrame];
   }
   
@@ -68,18 +67,12 @@ public class AnimationSequence {
     }
     setFrameTime(0);
   }
-  
-  public void move(Vec2 dir) {
-    for (Sprite s : getSprites()) {
-      s.move(dir);
-    }
-  }
 
-  public Sprite[] getSprites() {
+  public Image[] getSprites() {
     return sprites;
   }
 
-  public void setSprites(Sprite[] sprites) {
+  public void setSprites(Image[] sprites) {
     this.sprites = sprites;
   }
   
@@ -109,18 +102,6 @@ public class AnimationSequence {
 
   public void setDir(Direction dir) {
     this.dir = dir;
-  }
-  
-  @Override
-  public String toString() {
-    boolean containsNull = false;
-    for (Sprite s : sprites) {
-      if (s == null) {
-        containsNull = true;
-        break;
-      }
-    }
-    return sprites.length + " " + containsNull;
   }
 
 }

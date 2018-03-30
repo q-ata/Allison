@@ -1,10 +1,9 @@
 package game;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
-import engine.Sprite;
 import engine.Vec2;
+import javafx.scene.image.Image;
 
 public abstract class MapItem {
   
@@ -15,43 +14,20 @@ public abstract class MapItem {
   private boolean moving = false;
   private boolean solid = true;
   private Vec2 vel = new Vec2();
-  private ArrayList<CollisionData> touched = new ArrayList<CollisionData>();
+  private Hitbox hitbox;
   
   public MapItem(MapItemData data) {
     for (AnimationSequence direction : data.sequences()) {
       getSpriteSet().put(direction.dir(), direction);
     }
-    move(data.pos());
     setDir(Direction.UP);
+    setHitbox(data.box());
   }
   
   public abstract void collisionProperties(final Game INSTANCE);
   
-  public Sprite getCurrentSprite() {
+  public Image getCurrentSprite() {
     return getSpriteSet().get(dir()).getSprite();
-  }
-  
-  public void move(Vec2 dir) {
-    for (AnimationSequence an : getSpriteSet().values()) {
-      an.move(dir);
-    }
-    pos().add(dir);
-  }
-  
-  public void moveTo(Vec2 dest) {
-    setPos(dest.clone());
-    for (AnimationSequence an : getSpriteSet().values()) {
-      an.move(dest.clone().sub(pos()));
-    }
-  }
-  
-  public CollisionData touchedIncludes(CollisionData i) {
-    for (CollisionData c : getTouched()) {
-      if (i.equals(c)) {
-        return c;
-      }
-    }
-    return null;
   }
 
   public HashMap<Direction, AnimationSequence> getSpriteSet() {
@@ -110,12 +86,12 @@ public abstract class MapItem {
     this.vel = vel;
   }
 
-  public ArrayList<CollisionData> getTouched() {
-    return touched;
+  public Hitbox getHitbox() {
+    return hitbox;
   }
 
-  public void setTouched(ArrayList<CollisionData> touched) {
-    this.touched = touched;
+  public void setHitbox(Hitbox hitbox) {
+    this.hitbox = hitbox;
   }
 
 }

@@ -1,12 +1,9 @@
 package game;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.HashMap;
 
-import engine.Sprite;
 import engine.Vec2;
+import javafx.scene.image.Image;
 
 public final class MapItemLoader {
   
@@ -22,32 +19,53 @@ public final class MapItemLoader {
   }
   
   public static MapItemData load(String path, Vec2 pos) {
-    try {
-      String currentDir = new File("").getAbsolutePath() + "/resources/";
-      BufferedReader reader = new BufferedReader(new FileReader(currentDir + path + ".dat"));
+      /*
+4
+UP
+3
+15
+characters/main/back_0
+characters/main/back_1
+characters/main/back_2
+DOWN
+3
+15
+characters/main/forward_0
+characters/main/forward_1
+characters/main/forward_2
+LEFT
+3
+15
+characters/main/left_0
+characters/main/left_1
+characters/main/left_2
+RIGHT
+3
+15
+characters/main/right_0
+characters/main/right_1
+characters/main/right_2
+       */
+    DataFileReader reader = new DataFileReader(path);
+    final int DIRECTIONS = Integer.parseInt(reader.readLine());
+    AnimationSequence[] sequences = new AnimationSequence[DIRECTIONS];
+    
+    for (int d = 0; d < DIRECTIONS; d++) {
+      // Image[] sprites, int frameDuration, Direction dir
+      Direction dir = directionMap.get(reader.readLine());
+      final int COUNT = Integer.parseInt(reader.readLine());
+      int frameDuration = COUNT == 1 ? 0 : Integer.parseInt(reader.readLine());
+      Image[] sprites = new Image[COUNT];
       
-      int directionCount = Integer.parseInt(reader.readLine());
-      AnimationSequence[] sequences = new AnimationSequence[directionCount];
-      for (int d = 0; d < directionCount; d++) {
-        Direction dir = directionMap.get(reader.readLine());
-        int frames = Integer.parseInt(reader.readLine());
-        Sprite[] sprites = new Sprite[frames];
-        int frameTime = frames == 1 ? 0 : Integer.parseInt(reader.readLine());
-        for (int s = 0; s < frames; s++) {
-          String imagePath = reader.readLine();
-          String hitboxPath = reader.readLine();
-          sprites[s] = new Sprite(imagePath, hitboxPath);
-        }
-        sequences[d] = frames == 1 ? new AnimationSequence(sprites) : new AnimationSequence(sprites, frameTime, dir);
+      for (int s = 0; s < COUNT; s++) {
+        sprites[s] = new Image("file:resources/" + reader.readLine() + ".png");
       }
       
-      reader.close();
-      return new MapItemData(sequences, pos);
+      sequences[d] = sprites.length == 1 ? new AnimationSequence(sprites) : new AnimationSequence(sprites, frameDuration, dir);
     }
-    catch(Exception e) {
-      e.printStackTrace();
-      return null;
-    }
+    String boxPath = reader.readLine();
+    reader.close();
+    return new MapItemData(sequences, pos, new Hitbox(boxPath));
   }
 
 }

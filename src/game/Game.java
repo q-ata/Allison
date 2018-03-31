@@ -15,7 +15,7 @@ import javafx.util.Duration;
 public final class Game extends Application {
   
   private final int TARGETFPS = 60;
-  private final long INTERVAL = 16666666;
+  // Nanoseconds between each frame.
   private int fps = 0;
   private GraphicsContext gc;
   private boolean started = false;
@@ -29,13 +29,15 @@ public final class Game extends Application {
   @Override
   public void start(Stage stage) {
     try {
-      Canvas canvas = new Canvas(800, 600);
+      Canvas canvas = new Canvas(960, 540);
       GraphicsContext gc = canvas.getGraphicsContext2D();
       setGc(gc);
       gc().setFill(Color.WHITE);
       Scene scene = new Scene(new Group(canvas));
+      // Attach input handlers.
       scene.setOnKeyPressed(new KeyboardInputPressedHandler());
       scene.setOnKeyReleased(new KeyboardInputReleasedHandler());
+      
       stage.setScene(scene);
       stage.setTitle("Game");
       Image icon = new Image("file:resources/misc/window_icon.png");
@@ -47,6 +49,7 @@ public final class Game extends Application {
       GameLoop loop = new GameLoop(this);
       Timeline gameLoop = new Timeline();
       gameLoop.setCycleCount(Timeline.INDEFINITE);
+      // TODO: Dynamic millisecond interval depending on TARGETFPS.
       KeyFrame keyframe = new KeyFrame(Duration.millis(16.66), loop);
       gameLoop.getKeyFrames().add(keyframe);
       gameLoop.play();
@@ -59,10 +62,6 @@ public final class Game extends Application {
 
   public int getTARGETFPS() {
     return TARGETFPS;
-  }
-  
-  public long getINTERVAL() {
-    return INTERVAL;
   }
 
   public int getFps() {

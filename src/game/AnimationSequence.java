@@ -6,9 +6,13 @@ public class AnimationSequence {
   
   private Image[] sprites;
   private boolean animated = true;
+  // How many frames each sprite should last before animating to the next one.
   private final int FRAMEDURATION;
+  // How many frames have passed.
   private int frameTime = 0;
+  // The index of the current sprite.
   private int currentFrame = 0;
+  // If animating from left to right or vice versa of the array.
   private boolean increase = true;
   private Direction dir;
   
@@ -34,20 +38,11 @@ public class AnimationSequence {
     setDir(Direction.UP);
   }
   
-  /*
-  private Sprite[] loadSprites(String[] sprites) {
-    Sprite[] spriteList = new Sprite[sprites.length];
-    for (int i = 0; i < spriteList.length; i++) {
-      spriteList[i] = new Sprite(sprites[i], sprites[i]);
-    }
-    return spriteList;
-  }
-  */
-  
   public Image getSprite() {
     return getSprites()[currentFrame];
   }
   
+  // Execute each frame the MapItem is being animated.
   public void advanceAnimationTimer() {
     setFrameTime(getFrameTime() + 1);
     if (getFrameTime() == fDuration()) {
@@ -55,6 +50,7 @@ public class AnimationSequence {
     }
   }
   
+  // Change the sprite to the next one in the animation.
   public void advanceAnimation() {
     currentFrame += increase ? 1 : -1;
     if (currentFrame == getSprites().length) {

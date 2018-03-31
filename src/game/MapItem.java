@@ -7,12 +7,17 @@ import javafx.scene.image.Image;
 
 public abstract class MapItem {
   
+  // Direction : AnimationSequence hashmap for each direction that should be animated.
   private HashMap<Direction, AnimationSequence> spriteSet = new HashMap<Direction, AnimationSequence>();
   private Vec2 pos = new Vec2();
   private Direction dir;
+  // Whether the MapItem must be moving in order to be animated.
   private boolean needMoving = true;
+  // Whether the item is moving.
   private boolean moving = false;
+  // Whether the item should stop the movement of other items and be stopped by them.
   private boolean solid = true;
+  // Velocity vector.
   private Vec2 vel = new Vec2();
   private Hitbox hitbox;
   
@@ -24,7 +29,13 @@ public abstract class MapItem {
     setHitbox(data.box());
   }
   
+  // Special collision properties of the item.
   public abstract void collisionProperties(final Game INSTANCE);
+  
+  public void move(Vec2 direction) {
+    pos().add(direction);
+    getHitbox().move(direction);
+  }
   
   public Image getCurrentSprite() {
     return getSpriteSet().get(dir()).getSprite();

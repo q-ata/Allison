@@ -5,8 +5,10 @@ import java.util.HashMap;
 import engine.Vec2;
 import javafx.scene.image.Image;
 
+// Reads and loads MapItemData from a local data file.
 public final class MapItemLoader {
   
+  // String : Direction hashmap for converting string to Direction enum.
   private static HashMap<String, Direction> directionMap = mapDirections();
   
   private static HashMap<String, Direction> mapDirections() {
@@ -18,41 +20,16 @@ public final class MapItemLoader {
     return map;
   }
   
+  // Get MapItemData from data file.
   public static MapItemData load(String path, Vec2 pos) {
-      /*
-4
-UP
-3
-15
-characters/main/back_0
-characters/main/back_1
-characters/main/back_2
-DOWN
-3
-15
-characters/main/forward_0
-characters/main/forward_1
-characters/main/forward_2
-LEFT
-3
-15
-characters/main/left_0
-characters/main/left_1
-characters/main/left_2
-RIGHT
-3
-15
-characters/main/right_0
-characters/main/right_1
-characters/main/right_2
-       */
     DataFileReader reader = new DataFileReader(path);
+    // Number of animated directions.
     final int DIRECTIONS = Integer.parseInt(reader.readLine());
     AnimationSequence[] sequences = new AnimationSequence[DIRECTIONS];
     
     for (int d = 0; d < DIRECTIONS; d++) {
-      // Image[] sprites, int frameDuration, Direction dir
       Direction dir = directionMap.get(reader.readLine());
+      // The number of sprites in this sequence. One for no animation.
       final int COUNT = Integer.parseInt(reader.readLine());
       int frameDuration = COUNT == 1 ? 0 : Integer.parseInt(reader.readLine());
       Image[] sprites = new Image[COUNT];

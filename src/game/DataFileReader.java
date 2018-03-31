@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
+// Wrapper for BufferedReader to parse comments (lines that start with #).
 public class DataFileReader {
   
   private BufferedReader in;
@@ -21,6 +22,7 @@ public class DataFileReader {
   
   public String readLine() {
     try {
+      // Skip lines until it reaches one that is not a comment.
       String line = in.readLine();
       while (line.startsWith("#")) {
         line = in.readLine();

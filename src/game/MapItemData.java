@@ -2,6 +2,7 @@ package game;
 
 import engine.Vec2;
 
+// Encapsulated MapItem properties for the MapItem constructor.
 public class MapItemData {
   
   private AnimationSequence[] sequences;

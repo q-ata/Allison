@@ -21,10 +21,12 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     INSTANCE = instance;
     PlayableCharacter player = new PlayableCharacter(new Vec2(200, 200));
     mapItems.add(player);
+    player.move(new Vec2(500, 500));
     INSTANCE.setPlayer(player);
     mapItems.add(new BasicRock(new Vec2()));
   }
   
+  // TODO: Documentation for input, physics and render methods.
   @Override
   public void input() {
     MapItem main = mapItems.get(0);
@@ -72,10 +74,17 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     for (int i = 0; i < mapItems().size(); i++) {
       MapItem item = mapItems().get(i);
       if (item.vel().x() != 0 || item.vel().y() != 0) {
-        // TODO: Collision logic.
-        item.getHitbox().move(item.vel());
-        item.pos().add(item.vel());
-        item.getHitbox().move(item.vel());
+        item.move(item.vel());
+        for (int j = 0; j < mapItems().size(); j++) {
+          if (j == i) {
+            continue;
+          }
+          if (CollisionDetector.hitboxIntersects(item.getHitbox(), mapItems().get(j).getHitbox())) {
+            item.move(item.vel().clone().negate());
+            item.collisionProperties(INSTANCE);
+            mapItems().get(j).collisionProperties(INSTANCE);
+          }
+        }
       }
     }
     
@@ -105,6 +114,8 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     input();
     physics();
     render();
+    
+    // Calculate FPS.
     INSTANCE.setFps(INSTANCE.getFps() + 1);
     long now = System.nanoTime();
     long delta = now - prev;

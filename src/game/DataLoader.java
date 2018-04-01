@@ -6,7 +6,7 @@ import engine.Vec2;
 import javafx.scene.image.Image;
 
 // Reads and loads MapItemData from a local data file.
-public final class MapItemLoader {
+public final class DataLoader {
   
   // String : Direction hashmap for converting string to Direction enum.
   private static HashMap<String, Direction> directionMap = mapDirections();
@@ -21,7 +21,7 @@ public final class MapItemLoader {
   }
   
   // Get MapItemData from data file.
-  public static MapItemData load(String path, Vec2 pos) {
+  public static MapItemData loadMapItem(String path, Vec2 pos) {
     DataFileReader reader = new DataFileReader(path);
     // Number of animated directions.
     final int DIRECTIONS = Integer.parseInt(reader.readLine());

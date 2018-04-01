@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import engine.GameProcess;
 import engine.KeyboardInputs;
+import engine.Shape;
 import engine.Vec2;
 import game.blocks.BasicRock;
 import javafx.event.ActionEvent;
@@ -21,8 +22,8 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     INSTANCE = instance;
     PlayableCharacter player = new PlayableCharacter(new Vec2(200, 200));
     mapItems.add(player);
-    player.move(new Vec2(500, 500));
-    INSTANCE.setPlayer(player);
+    player.move(new Vec2(400, 300));
+    INSTANCE.setRun(new Run(System.nanoTime(), player));
     mapItems.add(new BasicRock(new Vec2()));
   }
   
@@ -105,6 +106,15 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
         seq.advanceAnimationTimer();
       }
       INSTANCE.gc().drawImage(seq.getSprite(), item.pos().x(), item.pos().y());
+      
+      for (int q = 0; q < item.getHitbox().getShapes().length; q++) {
+        for (int i = 0; i < ((Shape) item.getHitbox().getShapes()[q]).getPoints().length; i++) {
+          Shape s = (Shape) item.getHitbox().getShapes()[q];
+          Vec2 vec = s.getPoints()[i];
+          Vec2 next = i == s.getPoints().length - 1 ? s.getPoints()[0] : s.getPoints()[i + 1];
+          INSTANCE.gc().strokeLine(vec.x(), vec.y(), next.x(), next.y());
+        }
+      }
     }
     
   }

@@ -5,7 +5,7 @@ import engine.Vec2;
 public class PlayableCharacter extends MapItem {
   
   public PlayableCharacter(Vec2 pos) {
-    super(MapItemLoader.load("characters/main/build", pos));
+    super(DataLoader.loadMapItem("characters/main/build", pos));
   }
 
   @Override

@@ -20,7 +20,7 @@ public final class Game extends Application {
   private GraphicsContext gc;
   private boolean started = false;
   
-  private PlayableCharacter player;
+  private Run run;
   
   public void initGame() {
     launch();
@@ -33,6 +33,8 @@ public final class Game extends Application {
       GraphicsContext gc = canvas.getGraphicsContext2D();
       setGc(gc);
       gc().setFill(Color.WHITE);
+      gc().setStroke(Color.RED);
+      gc().setLineWidth(2.0);
       Scene scene = new Scene(new Group(canvas));
       // Attach input handlers.
       scene.setOnKeyPressed(new KeyboardInputPressedHandler());
@@ -49,8 +51,9 @@ public final class Game extends Application {
       GameLoop loop = new GameLoop(this);
       Timeline gameLoop = new Timeline();
       gameLoop.setCycleCount(Timeline.INDEFINITE);
-      // TODO: Dynamic millisecond interval depending on TARGETFPS.
-      KeyFrame keyframe = new KeyFrame(Duration.millis(16.66), loop);
+      // Dynamic millisecond interval depending on TARGETFPS. Yes it's pretty convoluted.
+      double interval = (double) (Math.round(((double) 1 / getTARGETFPS()) * 1000000)) / 1000;
+      KeyFrame keyframe = new KeyFrame(Duration.millis(interval), loop);
       gameLoop.getKeyFrames().add(keyframe);
       gameLoop.play();
       
@@ -88,12 +91,12 @@ public final class Game extends Application {
     this.started = started;
   }
 
-  public PlayableCharacter getPlayer() {
-    return player;
+  public Run getRun() {
+    return run;
   }
 
-  public void setPlayer(PlayableCharacter player) {
-    this.player = player;
+  public void setRun(Run run) {
+    this.run = run;
   }
 
 }

@@ -20,9 +20,10 @@ public final class DataLoader {
     return map;
   }
   
-  // Get MapItemData from data file.
-  public static MapItemData loadMapItem(String path, Vec2 pos) {
-    DataFileReader reader = new DataFileReader(path);
+  private static DataFileReader reader;
+  
+  public static AnimationSequence[] loadSequences(String path) {
+    reader = new DataFileReader(path);
     // Number of animated directions.
     final int DIRECTIONS = Integer.parseInt(reader.readLine());
     AnimationSequence[] sequences = new AnimationSequence[DIRECTIONS];
@@ -40,9 +41,22 @@ public final class DataLoader {
       
       sequences[d] = sprites.length == 1 ? new AnimationSequence(sprites) : new AnimationSequence(sprites, frameDuration, dir);
     }
+    return sequences;
+  }
+  
+  // Get MapItemData from data file.
+  public static MapItemData loadMapItem(String path, Vec2 pos) {
+    AnimationSequence[] sequences = loadSequences(path);
     String boxPath = reader.readLine();
     reader.close();
     return new MapItemData(sequences, pos, new Hitbox(boxPath));
+  }
+  
+  public static Vec2 loadHudWeaponSpriteOffset(String path) {
+    reader = new DataFileReader("weapons/" + path);
+    Vec2 offset = new Vec2(Integer.parseInt(reader.readLine()), Integer.parseInt(reader.readLine()));
+    reader.close();
+    return offset;
   }
 
 }

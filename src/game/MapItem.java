@@ -27,6 +27,7 @@ public abstract class MapItem {
     }
     setDir(Direction.UP);
     setHitbox(data.box());
+    move(data.pos());
   }
   
   // Special collision properties of the item.

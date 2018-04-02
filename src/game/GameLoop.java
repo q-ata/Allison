@@ -1,6 +1,6 @@
 package game;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import engine.GameProcess;
 import engine.KeyboardInputs;
@@ -16,21 +16,19 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   private final Game INSTANCE;
   private long passed = 0;
   private long prev = System.nanoTime();
-  private ArrayList<MapItem> mapItems = new ArrayList<MapItem>();
   
   public GameLoop(Game instance) {
     INSTANCE = instance;
-    PlayableCharacter player = new PlayableCharacter(new Vec2(200, 200));
-    mapItems.add(player);
-    player.move(new Vec2(400, 300));
+    PlayableCharacter player = new PlayableCharacter();
     INSTANCE.setRun(new Run(System.nanoTime(), player));
-    mapItems.add(new BasicRock(new Vec2()));
+    // TODO: Remove later.
+    INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(200, 150)));
   }
   
   // TODO: Documentation for input, physics and render methods.
   @Override
   public void input() {
-    MapItem main = mapItems.get(0);
+    MapItem main = INSTANCE.getRun().getCurrentRoom().mapItems().get(0);
     boolean advance = true;
     if (KeyboardInputs.KEYMAP.get(KeyCode.W)) {
       if (main.dir() != Direction.UP) {
@@ -72,18 +70,20 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   @Override
   public void physics() {
     
-    for (int i = 0; i < mapItems().size(); i++) {
-      MapItem item = mapItems().get(i);
+    List<MapItem> mapItems = INSTANCE.getRun().getCurrentRoom().mapItems();
+    
+    for (int i = 0; i < mapItems.size(); i++) {
+      MapItem item = mapItems.get(i);
       if (item.vel().x() != 0 || item.vel().y() != 0) {
         item.move(item.vel());
-        for (int j = 0; j < mapItems().size(); j++) {
+        for (int j = 0; j < mapItems.size(); j++) {
           if (j == i) {
             continue;
           }
-          if (CollisionDetector.hitboxIntersects(item.getHitbox(), mapItems().get(j).getHitbox())) {
+          if (CollisionDetector.hitboxIntersects(item.getHitbox(), mapItems.get(j).getHitbox())) {
             item.move(item.vel().clone().negate());
             item.collisionProperties(INSTANCE);
-            mapItems().get(j).collisionProperties(INSTANCE);
+            mapItems.get(j).collisionProperties(INSTANCE);
           }
         }
       }
@@ -96,7 +96,8 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     
     INSTANCE.gc().fillRect(0, 0, 800, 600);
     
-    for (MapItem item : mapItems()) {
+    // Render all map items and process animations.
+    for (MapItem item : INSTANCE.getRun().getCurrentRoom().mapItems()) {
       if (item == null) {
         continue;
       }
@@ -117,6 +118,16 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
       }
     }
     
+    // Render HUD.
+    INSTANCE.gc().drawImage(HUDSprites.HUDBASE, 3, 3);
+    // Render health and mana bar depending on amount remaining.
+    INSTANCE.gc().drawImage(HUDSprites.HUDHEALTH, 0, 0, 127, 11, 66, 24, (int) Math.round(127 / (100 / INSTANCE.getRun().getPLAYER().getHealth())), 11);
+    Weapon weapon = INSTANCE.getRun().getPLAYER().getWeapon();
+    INSTANCE.gc().drawImage(HUDSprites.HUDMANA, 0, 0, 123, 6, 66, 40, (int) Math.round(123 / (100 / weapon.getMana())), 6);
+    
+    // Render weapon sprite in HUD.
+    INSTANCE.gc().drawImage(weapon.getHudSprite(), 10 + weapon.getHudOffset().x(), 10 + weapon.getHudOffset().y());
+    
   }
 
   @Override
@@ -136,14 +147,6 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
       System.out.println(INSTANCE.getFps() + " FPS");
       INSTANCE.setFps(0);
     }
-  }
-
-  public ArrayList<MapItem> mapItems() {
-    return mapItems;
-  }
-
-  public void setMapItems(ArrayList<MapItem> mapItems) {
-    this.mapItems = mapItems;
   }
 
 }

@@ -17,6 +17,8 @@ public class Room {
   public Room(int id, PlayableCharacter player) {
     ID = id;
     PLAYER = player;
+    mapItems().add(getPLAYER());
+    killables().add(getPLAYER());
     // TODO: Load room based on ID.
   }
 

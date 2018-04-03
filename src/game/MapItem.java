@@ -5,7 +5,7 @@ import java.util.HashMap;
 import engine.Vec2;
 import javafx.scene.image.Image;
 
-public abstract class MapItem {
+public abstract class MapItem implements Collider {
   
   // Direction : AnimationSequence hashmap for each direction that should be animated.
   private HashMap<Direction, AnimationSequence> spriteSet = new HashMap<Direction, AnimationSequence>();
@@ -29,9 +29,6 @@ public abstract class MapItem {
     setHitbox(data.box());
     move(data.pos());
   }
-  
-  // Special collision properties of the item.
-  public abstract void collisionProperties(final Game INSTANCE);
   
   public void move(Vec2 direction) {
     pos().add(direction);

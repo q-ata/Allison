@@ -10,12 +10,6 @@ public class PlayableCharacter extends Killable {
   
   public PlayableCharacter() {
     super(DataLoader.loadMapItem("characters/main/build", new Vec2(453, 239)), DataLoader.loadSequences("characters/main/damaged"));
-    setHealth(100);
-  }
-
-  @Override
-  public void collisionProperties(final Game INSTANCE) {
-    return;
   }
 
   public Stats getStats() {

@@ -9,7 +9,7 @@ public class Room {
   private final PlayableCharacter PLAYER;
   
   private List<MapItem> mapItems = new ArrayList<MapItem>();
-  private List<Killable> killables = new ArrayList<Killable>();
+  private List<Entity> entities = new ArrayList<Entity>();
   
   private boolean visited = false;
   private boolean cleared = false;
@@ -18,7 +18,6 @@ public class Room {
     ID = id;
     PLAYER = player;
     mapItems().add(getPLAYER());
-    killables().add(getPLAYER());
     // TODO: Load room based on ID.
   }
 
@@ -34,8 +33,8 @@ public class Room {
     return mapItems;
   }
 
-  public List<Killable> killables() {
-    return killables;
+  public List<Entity> entities() {
+    return entities;
   }
 
   public boolean isVisited() {

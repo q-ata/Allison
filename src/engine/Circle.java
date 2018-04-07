@@ -14,14 +14,6 @@ public class Circle implements Convex {
   }
 
   /**
-   * Get the center coordinates of this circle.
-   * @return A 2 component vector containing this circle's center.
-   */
-  public Vec2 getCenter() {
-    return center;
-  }
-
-  /**
    * Set the center of this circle.
    * @param center A 2 component vector of the new center.
    */
@@ -57,6 +49,11 @@ public class Circle implements Convex {
   @Override
   public void changePosition(Vec2 direction) {
     center.add(direction);
+  }
+  
+  @Override
+  public Vec2 getCenter() {
+    return center;
   }
 
 }

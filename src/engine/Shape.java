@@ -45,6 +45,29 @@ public class Shape implements Convex {
   private void setPoints(Vec2[] points) {
     this.points = points;
   }
+  
+  @Override
+  public void flip(boolean vertical) {
+    double mean = 0;
+    double max = 0;
+    int len = getPoints().length;
+    for (int i = 0; i < len; i++) {
+      double value = vertical ? getPoints()[i].y() : getPoints()[i].x();
+      if (value > max) {
+        max = value;
+      }
+      mean += value;
+    }
+    mean /= len;
+    for (Vec2 point : getPoints()) {
+      if (vertical) {
+        point.setY((mean * 2) - point.y());
+      }
+      else {
+        point.setX((mean * 2) - point.x());
+      }
+    }
+  }
 
   @Override
   public Vec2 getFarthestPoint(Vec2 direction) {
@@ -65,9 +88,19 @@ public class Shape implements Convex {
   
   @Override
   public void changePosition(Vec2 direction) {
-    for (int i = 0; i < getNpoints(); i++) {
-      getPoints()[i].add(direction);
+    for (Vec2 point : getPoints()) {
+      point.add(direction);
     }
+  }
+  
+  @Override
+  public Vec2 getCenter() {
+    Vec2 center = new Vec2();
+    for (Vec2 point : getPoints()) {
+      center.add(point);
+    }
+    center.set(center.x() / getPoints().length, center.y() / getPoints().length);
+    return center;
   }
   
   @Override

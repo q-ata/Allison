@@ -17,5 +17,19 @@ public interface Convex {
    * @param direction The direction vector to move in.
    */
   public abstract void changePosition(Vec2 direction);
+  
+  /**
+   * Flip this convex.
+   * @param vertical Whether or not to flip vertically. If false, the flip will be horizontal.
+   */
+  public default void flip(boolean vertical) {
+    return;
+  }
+  
+  /**
+   * Returns the center of this convex.
+   * @return The center.
+   */
+  public abstract Vec2 getCenter();
 
 }

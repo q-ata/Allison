@@ -46,6 +46,15 @@ public class Hitbox {
       shape.changePosition(direction);
     }
   }
+  
+  public Vec2 getCenter() {
+    Vec2 center = new Vec2();
+    for (Convex s : getShapes()) {
+      center.add(s.getCenter());
+    }
+    center.set(center.x() / getShapes().length, center.y() / getShapes().length);
+    return center;
+  }
 
   public Convex[] getShapes() {
     return shapes;

@@ -7,6 +7,7 @@ public abstract class Killable extends MapItem {
   private int health = 100;
   private HashMap<Direction, AnimationSequence> damagedSprites = new HashMap<Direction, AnimationSequence>();
   private boolean damaged;
+  private double resistance = 1.0;
   
   public Killable(MapItemData data, AnimationSequence[] damagedSprites) {
     super(data);
@@ -37,6 +38,14 @@ public abstract class Killable extends MapItem {
 
   public void setDamaged(boolean damaged) {
     this.damaged = damaged;
+  }
+
+  public double getResistance() {
+    return resistance;
+  }
+
+  public void setResistance(double resistance) {
+    this.resistance = resistance;
   }
 
 }

@@ -2,7 +2,6 @@ package game.blocks;
 
 import engine.Vec2;
 import game.DataLoader;
-import game.Game;
 import game.MapItem;
 
 public class BasicRock extends MapItem {

@@ -2,11 +2,14 @@ package game;
 
 import java.util.List;
 
+import engine.Circle;
+import engine.Convex;
 import engine.GameProcess;
 import engine.KeyboardInputs;
 import engine.Shape;
 import engine.Vec2;
 import game.blocks.BasicRock;
+import game.entities.Fly;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
@@ -23,6 +26,11 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     INSTANCE.setRun(new Run(System.nanoTime(), player));
     // TODO: Remove later.
     INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(200, 150)));
+    INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(600, 250)));
+    INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(400, 150)));
+    Fly fly = new Fly(new Vec2(150, 350));
+    INSTANCE.getRun().getCurrentRoom().mapItems().add(fly);
+    INSTANCE.getRun().getCurrentRoom().entities().add(fly);
   }
   
   // TODO: Documentation for input, physics and render methods.
@@ -34,25 +42,25 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
       if (main.dir() != Direction.UP) {
         main.setDir(Direction.UP);
       }
-      main.setVel(new Vec2(0, -2));
+      main.setVel(new Vec2(0, -2.5));
     }
     else if (KeyboardInputs.KEYMAP.get(KeyCode.S)) {
       if (main.dir() != Direction.DOWN) {
         main.setDir(Direction.DOWN);
       }
-      main.setVel(new Vec2(0, 2));
+      main.setVel(new Vec2(0, 2.5));
     }
     else if (KeyboardInputs.KEYMAP.get(KeyCode.A)) {
       if (main.dir() != Direction.LEFT) {
         main.setDir(Direction.LEFT);
       }
-      main.setVel(new Vec2(-2, 0));
+      main.setVel(new Vec2(-2.5, 0));
     }
     else if (KeyboardInputs.KEYMAP.get(KeyCode.D)) {
       if (main.dir() != Direction.RIGHT) {
         main.setDir(Direction.RIGHT);
       }
-      main.setVel(new Vec2(2, 0));
+      main.setVel(new Vec2(2.5, 0));
     }
     else {
       advance = false;
@@ -70,6 +78,10 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   @Override
   public void physics() {
     
+    for (Entity entity : INSTANCE.getRun().getCurrentRoom().entities()) {
+      entity.ai(INSTANCE);
+    }
+    
     List<MapItem> mapItems = INSTANCE.getRun().getCurrentRoom().mapItems();
     
     for (int i = 0; i < mapItems.size(); i++) {
@@ -81,9 +93,14 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
             continue;
           }
           if (CollisionDetector.hitboxIntersects(item.getHitbox(), mapItems.get(j).getHitbox())) {
-            item.move(item.vel().clone().negate());
-            item.collisionProperties(INSTANCE);
-            mapItems.get(j).collisionProperties(INSTANCE);
+            if (item.isSolid() && mapItems.get(j).isSolid()) {
+              item.collisionProperties(INSTANCE, mapItems.get(j));
+              mapItems.get(j).collisionProperties(INSTANCE, item);
+              // It is possible for collision properties method to change whether or not the item is solid.
+              if (item.isSolid() && mapItems.get(j).isSolid()) {
+                item.move(item.vel().clone().negate());
+              }
+            }
           }
         }
       }
@@ -94,7 +111,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   @Override
   public void render() {
     
-    INSTANCE.gc().fillRect(0, 0, 800, 600);
+    INSTANCE.gc().fillRect(0, 0, INSTANCE.gc().getCanvas().getWidth(), INSTANCE.gc().getCanvas().getHeight());
     
     // Render all map items and process animations.
     for (MapItem item : INSTANCE.getRun().getCurrentRoom().mapItems()) {
@@ -109,13 +126,20 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
       INSTANCE.gc().drawImage(seq.getSprite(), item.pos().x(), item.pos().y());
       
       for (int q = 0; q < item.getHitbox().getShapes().length; q++) {
-        for (int i = 0; i < ((Shape) item.getHitbox().getShapes()[q]).getPoints().length; i++) {
-          Shape s = (Shape) item.getHitbox().getShapes()[q];
+        Convex c = item.getHitbox().getShapes()[q];
+        if (!(c instanceof Shape)) {
+          Circle circle = (Circle) c;
+          INSTANCE.gc().strokeOval(circle.getCenter().x() - circle.getRadius(), circle.getCenter().y() - circle.getRadius(), circle.getRadius() * 2, circle.getRadius() * 2);
+          continue;
+        }
+        for (int i = 0; i < ((Shape) c).getPoints().length; i++) {
+          Shape s = (Shape) c;
           Vec2 vec = s.getPoints()[i];
           Vec2 next = i == s.getPoints().length - 1 ? s.getPoints()[0] : s.getPoints()[i + 1];
           INSTANCE.gc().strokeLine(vec.x(), vec.y(), next.x(), next.y());
         }
       }
+
     }
     
     // Render HUD.

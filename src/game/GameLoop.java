@@ -30,7 +30,6 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(400, 150)));
     Fly fly = new Fly(new Vec2(150, 350));
     INSTANCE.getRun().getCurrentRoom().mapItems().add(fly);
-    INSTANCE.getRun().getCurrentRoom().entities().add(fly);
   }
   
   // TODO: Documentation for input, physics and render methods.
@@ -78,14 +77,13 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   @Override
   public void physics() {
     
-    for (Entity entity : INSTANCE.getRun().getCurrentRoom().entities()) {
-      entity.ai(INSTANCE);
-    }
-    
     List<MapItem> mapItems = INSTANCE.getRun().getCurrentRoom().mapItems();
     
     for (int i = 0; i < mapItems.size(); i++) {
       MapItem item = mapItems.get(i);
+      if (item instanceof Entity) {
+        ((Entity) item).ai(INSTANCE);
+      }
       if (item.vel().x() != 0 || item.vel().y() != 0) {
         item.move(item.vel());
         for (int j = 0; j < mapItems.size(); j++) {
@@ -99,6 +97,12 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
               // It is possible for collision properties method to change whether or not the item is solid.
               if (item.isSolid() && mapItems.get(j).isSolid()) {
                 item.move(item.vel().clone().negate());
+                if (item instanceof Entity && mapItems.get(j) instanceof PlayableCharacter) {
+                  PlayableCharacter player = INSTANCE.getRun().getPLAYER();
+                  // TODO: Factor in player stats, make player invincible and make this system better in general.
+                  player.setHealth(player.getHealth() - ((Entity) item).getDamage());
+                  System.out.println(player.getHealth());
+                }
               }
             }
           }

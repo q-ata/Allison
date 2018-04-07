@@ -9,7 +9,6 @@ public class Room {
   private final PlayableCharacter PLAYER;
   
   private List<MapItem> mapItems = new ArrayList<MapItem>();
-  private List<Entity> entities = new ArrayList<Entity>();
   
   private boolean visited = false;
   private boolean cleared = false;
@@ -31,10 +30,6 @@ public class Room {
 
   public List<MapItem> mapItems() {
     return mapItems;
-  }
-
-  public List<Entity> entities() {
-    return entities;
   }
 
   public boolean isVisited() {

@@ -1,26 +1,23 @@
 package game;
 
-import engine.Vec2;
-
 // Encapsulated MapItem properties for the MapItem constructor.
 public class MapItemData {
   
   private AnimationSequence[] sequences;
-  private Vec2 pos;
   private Hitbox box;
   
-  public MapItemData(AnimationSequence[] sequences, Vec2 pos, Hitbox box) {
+  public MapItemData(AnimationSequence[] sequences, Hitbox box) {
     this.sequences = sequences;
-    this.pos = pos;
+    this.box = box;
+  }
+  
+  public MapItemData(AnimationSequence sequence, Hitbox box) {
+    this.sequences = new AnimationSequence[] {sequence};
     this.box = box;
   }
   
   public AnimationSequence[] sequences() {
     return sequences;
-  }
-  
-  public Vec2 pos() {
-    return pos;
   }
   
   public Hitbox box() {

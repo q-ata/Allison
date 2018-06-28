@@ -20,6 +20,9 @@ public final class Game extends Application {
   private GraphicsContext gc;
   private boolean started = false;
   
+  private final int WINDOW_WIDTH = 960;
+  private final int WINDOW_HEIGHT = 540;
+  
   private Run run;
   
   public void initGame() {
@@ -29,7 +32,7 @@ public final class Game extends Application {
   @Override
   public void start(Stage stage) {
     try {
-      Canvas canvas = new Canvas(960, 540);
+      Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
       GraphicsContext gc = canvas.getGraphicsContext2D();
       setGc(gc);
       gc().setFill(Color.WHITE);

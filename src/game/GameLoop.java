@@ -10,6 +10,7 @@ import engine.Shape;
 import engine.Vec2;
 import game.blocks.BasicRock;
 import game.entities.Fly;
+import game.weapons.TestWeapon;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
@@ -23,18 +24,55 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   public GameLoop(Game instance) {
     INSTANCE = instance;
     PlayableCharacter player = new PlayableCharacter();
+    player.setWeapon(new TestWeapon(INSTANCE));
     INSTANCE.setRun(new Run(System.nanoTime(), player));
     // TODO: Remove later.
-    INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(200, 150)));
+    BasicRock rock = new BasicRock(new Vec2(200, 150));
+    INSTANCE.getRun().getCurrentRoom().mapItems().add(rock);
     INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(600, 250)));
     INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(400, 150)));
     Fly fly = new Fly(new Vec2(150, 350));
     INSTANCE.getRun().getCurrentRoom().mapItems().add(fly);
   }
   
+  private void handleProjectileInput() {
+    PlayableCharacter player = INSTANCE.getRun().getPlayer();
+    Projectile proj;
+    if (player.getWeaponCooldown() != 0) {
+      return;
+    }
+    if (KeyboardInputs.KEYMAP.get(KeyCode.UP)) {
+      proj = player.getWeapon().getSequence().locate(Direction.UP, INSTANCE, player.getWeapon().getData());
+    }
+    else if (KeyboardInputs.KEYMAP.get(KeyCode.DOWN)) {
+      proj = player.getWeapon().getSequence().locate(Direction.DOWN, INSTANCE, player.getWeapon().getData());
+    }
+    else if (KeyboardInputs.KEYMAP.get(KeyCode.LEFT)) {
+      proj = player.getWeapon().getSequence().locate(Direction.LEFT, INSTANCE, player.getWeapon().getData());
+    }
+    else if (KeyboardInputs.KEYMAP.get(KeyCode.RIGHT)) {
+      proj = player.getWeapon().getSequence().locate(Direction.RIGHT, INSTANCE, player.getWeapon().getData());
+    }
+    else {
+      return;
+    }
+    
+    player.getWeapon().getSequence().generate(proj, INSTANCE);
+  }
+  
   // TODO: Documentation for input, physics and render methods.
   @Override
   public void input() {
+    
+    handleProjectileInput();
+    for (Runnable runnable : INSTANCE.getRun().getSchedulers()) {
+      runnable.run();
+    }
+    for (Runnable runnable : INSTANCE.getRun().toRemove()) {
+      INSTANCE.getRun().getSchedulers().remove(runnable);
+    }
+    INSTANCE.getRun().toRemove().clear();
+    
     MapItem main = INSTANCE.getRun().getCurrentRoom().mapItems().get(0);
     boolean advance = true;
     if (KeyboardInputs.KEYMAP.get(KeyCode.W)) {
@@ -77,12 +115,20 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   @Override
   public void physics() {
     
+    PlayableCharacter p = INSTANCE.getRun().getPlayer();
+    if (p.getWeaponCooldown() != 0 && p.increaseWeaponCooldown() >= p.getWeapon().getCooldown()) {
+      p.setWeaponCooldown(0);
+    }
+    
     List<MapItem> mapItems = INSTANCE.getRun().getCurrentRoom().mapItems();
     
     for (int i = 0; i < mapItems.size(); i++) {
       MapItem item = mapItems.get(i);
       if (item instanceof Entity) {
         ((Entity) item).ai(INSTANCE);
+      }
+      else if (item instanceof Projectile) {
+        INSTANCE.getRun().getPlayer().getWeapon().getSequence().behaviour((Projectile) item);
       }
       if (item.vel().x() != 0 || item.vel().y() != 0) {
         item.move(item.vel());
@@ -98,10 +144,9 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
               if (item.isSolid() && mapItems.get(j).isSolid()) {
                 item.move(item.vel().clone().negate());
                 if (item instanceof Entity && mapItems.get(j) instanceof PlayableCharacter) {
-                  PlayableCharacter player = INSTANCE.getRun().getPLAYER();
+                  PlayableCharacter player = INSTANCE.getRun().getPlayer();
                   // TODO: Factor in player stats, make player invincible and make this system better in general.
                   player.setHealth(player.getHealth() - ((Entity) item).getDamage());
-                  System.out.println(player.getHealth());
                 }
               }
             }
@@ -123,11 +168,17 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
         continue;
       }
       
-      AnimationSequence seq = item.getSpriteSet().get(item.dir());
+      AnimationSequence seq = item.getSpriteSet().computeIfAbsent(item.dir(), (a) -> item.getSpriteSet().get(Direction.UP));
       if (!(item.isNeedMoving() && !item.isMoving())) {
         seq.advanceAnimationTimer();
       }
-      INSTANCE.gc().drawImage(seq.getSprite(), item.pos().x(), item.pos().y());
+      if (item instanceof Projectile) {
+        Projectile proj = (Projectile) item;
+        INSTANCE.gc().drawImage(seq.getSprite(), item.pos().x(), item.pos().y(), proj.getWidth(), proj.getHeight());
+      }
+      else {
+        INSTANCE.gc().drawImage(seq.getSprite(), item.pos().x(), item.pos().y());
+      }
       
       for (int q = 0; q < item.getHitbox().getShapes().length; q++) {
         Convex c = item.getHitbox().getShapes()[q];
@@ -149,9 +200,9 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     // Render HUD.
     INSTANCE.gc().drawImage(HUDSprites.HUDBASE, 3, 3);
     // Render health and mana bar depending on amount remaining.
-    INSTANCE.gc().drawImage(HUDSprites.HUDHEALTH, 0, 0, 127, 11, 66, 24, (int) Math.round(127 / (100 / INSTANCE.getRun().getPLAYER().getHealth())), 11);
-    Weapon weapon = INSTANCE.getRun().getPLAYER().getWeapon();
-    INSTANCE.gc().drawImage(HUDSprites.HUDMANA, 0, 0, 123, 6, 66, 40, (int) Math.round(123 / (100 / weapon.getMana())), 6);
+    INSTANCE.gc().drawImage(HUDSprites.HUDHEALTH, 0, 0, 127, 11, 66, 24, (int) Math.round(127d / (100d / INSTANCE.getRun().getPlayer().getHealth())), 11);
+    Weapon weapon = INSTANCE.getRun().getPlayer().getWeapon();
+    INSTANCE.gc().drawImage(HUDSprites.HUDMANA, 0, 0, 123, 6, 66, 40, (int) Math.round(123d / (100d / weapon.getMana())), 6);
     
     // Render weapon sprite in HUD.
     INSTANCE.gc().drawImage(weapon.getHudSprite(), 10 + weapon.getHudOffset().x(), 10 + weapon.getHudOffset().y());

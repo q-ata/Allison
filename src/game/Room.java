@@ -6,7 +6,7 @@ import java.util.List;
 public class Room {
   
   private final int ID;
-  private final PlayableCharacter PLAYER;
+  private PlayableCharacter player;
   
   private List<MapItem> mapItems = new ArrayList<MapItem>();
   
@@ -15,8 +15,8 @@ public class Room {
   
   public Room(int id, PlayableCharacter player) {
     ID = id;
-    PLAYER = player;
-    mapItems().add(getPLAYER());
+    this.player = player;
+    mapItems().add(getPlayer());
     // TODO: Load room based on ID.
   }
 
@@ -24,8 +24,8 @@ public class Room {
     return ID;
   }
 
-  public PlayableCharacter getPLAYER() {
-    return PLAYER;
+  public PlayableCharacter getPlayer() {
+    return player;
   }
 
   public List<MapItem> mapItems() {

@@ -1,0 +1,19 @@
+# rateBoost INT
+0
+# rateMulti
+1
+# speedBoost
+0
+# speedMulti
+1
+# damageBoost INT
+0
+# damageMulti
+1
+# rangeBoost
+0
+# rangeMulti
+1
+# ProjectileSprites data
+UP
+weapons/test_weapon/rem/up

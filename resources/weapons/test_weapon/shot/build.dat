@@ -1,0 +1,35 @@
+# rateBoost INT
+0
+# rateMulti
+1
+# speedBoost
+0
+# speedMulti
+1
+# damageBoost INT
+0
+# damageMulti
+1
+# rangeBoost
+0
+# rangeMulti
+1
+# scaleBoost - Should always be 0, initial size should reflect image and hitbox definitions.
+0
+# scaleMulti - Should always be 1
+1
+# ProjectileSprites data
+# TODO: make hitbox files
+# UP, DOWN, LEFT, RIGHT
+weapons/test_weapon/shot/hitbox_up
+1
+weapons/test_weapon/shot/shot_top_or_bottom
+weapons/test_weapon/shot/hitbox_up
+1
+weapons/test_weapon/shot/shot_top_or_bottom
+weapons/test_weapon/shot/hitbox_left
+1
+weapons/test_weapon/shot/shot_left_or_right
+weapons/test_weapon/shot/hitbox_left
+1
+weapons/test_weapon/shot/shot_left_or_right

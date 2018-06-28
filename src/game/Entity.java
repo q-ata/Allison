@@ -1,11 +1,13 @@
 package game;
 
+import engine.Vec2;
+
 public abstract class Entity extends Killable implements AI {
   
-  private int damage = 10;
+  private int damage = 0;
 
-  public Entity(MapItemData data, AnimationSequence[] damagedSprites) {
-    super(data, damagedSprites);
+  public Entity(Vec2 pos, String damagedSprites) {
+    super(pos, damagedSprites);
   }
 
   public int getDamage() {

@@ -1,8 +1,6 @@
 package game.entities;
 
 import engine.Vec2;
-import game.AnimationSequence;
-import game.DataLoader;
 import game.Entity;
 import game.Game;
 import game.MapItem;
@@ -18,7 +16,7 @@ public class Fly extends Entity {
   private int idleTime = 0;
 
   public Fly(Vec2 pos) {
-    super(DataLoader.loadMapItem("enemies/fly/build", pos), new AnimationSequence[] {});
+    super(pos, "enemies/fly/damaged"); 
   }
   
   @Override
@@ -26,7 +24,7 @@ public class Fly extends Entity {
     if (!isSolid()) {
       setSolid(true);
     }
-    PlayableCharacter player = INSTANCE.getRun().getPLAYER();
+    PlayableCharacter player = INSTANCE.getRun().getPlayer();
     Vec2 center = player.getHitbox().getCenter();
     Vec2 diff = center.sub(getHitbox().getCenter());
     Vec2 newVel = new Vec2();

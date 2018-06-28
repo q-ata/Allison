@@ -41,6 +41,10 @@ public class Hitbox {
     reader.close();
   }
   
+  public Hitbox(Convex[] shapes) {
+    setShapes(shapes);
+  }
+  
   public void move(Vec2 direction) {
     for (Convex shape : getShapes()) {
       shape.changePosition(direction);
@@ -54,6 +58,10 @@ public class Hitbox {
     }
     center.set(center.x() / getShapes().length, center.y() / getShapes().length);
     return center;
+  }
+  
+  public Hitbox clone() {
+    return new Hitbox(getShapes().clone());
   }
 
   public Convex[] getShapes() {

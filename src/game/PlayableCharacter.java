@@ -14,7 +14,6 @@ public class PlayableCharacter extends Killable {
   // damage multiplier.
   // range increase.
   // range multiplier.
-  // TODO: Multipliers should probably be zero.
   private Stats stats = new Stats();
   private Weapon weapon;
   private int weaponCooldown = 0;

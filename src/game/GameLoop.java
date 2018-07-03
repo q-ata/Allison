@@ -28,11 +28,11 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     INSTANCE.setRun(new Run(System.nanoTime(), player));
     // TODO: Remove later.
     BasicRock rock = new BasicRock(new Vec2(200, 150));
-    INSTANCE.getRun().getCurrentRoom().mapItems().add(rock);
-    INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(600, 250)));
-    INSTANCE.getRun().getCurrentRoom().mapItems().add(new BasicRock(new Vec2(400, 150)));
     Fly fly = new Fly(new Vec2(150, 350));
-    INSTANCE.getRun().getCurrentRoom().mapItems().add(fly);
+    INSTANCE.getRun().getCurrentRoom().getItems().addBlock(rock);
+    INSTANCE.getRun().getCurrentRoom().getItems().addBlock(new BasicRock(new Vec2(600, 250)));
+    INSTANCE.getRun().getCurrentRoom().getItems().addBlock(new BasicRock(new Vec2(400, 150)));
+    INSTANCE.getRun().getCurrentRoom().getItems().addEntity(fly);
   }
   
   private void handleProjectileInput() {
@@ -73,7 +73,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     }
     INSTANCE.getRun().toRemove().clear();
     
-    MapItem main = INSTANCE.getRun().getCurrentRoom().mapItems().get(0);
+    MapItem main = INSTANCE.getRun().getCurrentRoom().getItems().all().get(0);
     boolean advance = true;
     if (KeyboardInputs.KEYMAP.get(KeyCode.W)) {
       if (main.dir() != Direction.UP) {
@@ -115,43 +115,42 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   @Override
   public void physics() {
     
-    PlayableCharacter p = INSTANCE.getRun().getPlayer();
-    if (p.getWeaponCooldown() != 0 && p.increaseWeaponCooldown() >= p.getWeapon().getCooldown()) {
-      p.setWeaponCooldown(0);
+    PlayableCharacter player = INSTANCE.getRun().getPlayer();
+    if (player.getWeaponCooldown() != 0 && player.increaseWeaponCooldown() >= player.getWeapon().getCooldown()) {
+      player.setWeaponCooldown(0);
     }
     
-    List<MapItem> mapItems = INSTANCE.getRun().getCurrentRoom().mapItems();
+    List<MapItem> all = INSTANCE.getRun().getCurrentRoom().getItems().all();
     
-    for (int i = 0; i < mapItems.size(); i++) {
-      MapItem item = mapItems.get(i);
-      if (item instanceof Entity) {
-        ((Entity) item).ai(INSTANCE);
+    for (Entity e : INSTANCE.getRun().getCurrentRoom().getItems().entities()) {
+      e.ai(INSTANCE);
+    }
+    
+    for (Projectile p : INSTANCE.getRun().getCurrentRoom().getItems().projectiles()) {
+      player.getWeapon().getSequence().behaviour(p);
+    }
+    
+    for (int i = 0; i < all.size(); i++) {
+      MapItem item = all.get(i);
+      if (item.vel().sum() == 0.0 && !(item instanceof Projectile)) {
+        continue;
       }
-      else if (item instanceof Projectile) {
-        INSTANCE.getRun().getPlayer().getWeapon().getSequence().behaviour((Projectile) item);
-      }
-      if (item.vel().x() != 0 || item.vel().y() != 0) {
-        item.move(item.vel());
-        for (int j = 0; j < mapItems.size(); j++) {
-          if (j == i) {
-            continue;
-          }
-          if (CollisionDetector.hitboxIntersects(item.getHitbox(), mapItems.get(j).getHitbox())) {
-            if (item.isSolid() && mapItems.get(j).isSolid()) {
-              item.collisionProperties(INSTANCE, mapItems.get(j));
-              mapItems.get(j).collisionProperties(INSTANCE, item);
-              // It is possible for collision properties method to change whether or not the item is solid.
-              if (item.isSolid() && mapItems.get(j).isSolid()) {
-                item.move(item.vel().clone().negate());
-                if (item instanceof Entity && mapItems.get(j) instanceof PlayableCharacter) {
-                  PlayableCharacter player = INSTANCE.getRun().getPlayer();
-                  // TODO: Factor in player stats, make player invincible and make this system better in general.
-                  player.setHealth(player.getHealth() - ((Entity) item).getDamage());
-                }
-              }
-            }
-          }
+      item.move(item.vel());
+      for (int j = 0; j < all.size(); j++) {
+        if (j == i || !CollisionDetector.hitboxIntersects(item.getHitbox(), all.get(j).getHitbox())) {
+          continue;
         }
+        MapItem target = all.get(j);
+        if (!item.isSolid() || !target.isSolid() || !item.collisionValid(INSTANCE, target) || !target.collisionValid(INSTANCE, item)) {
+          continue;
+        }
+        item.collisionProperties(INSTANCE, all.get(j));
+        target.collisionProperties(INSTANCE, item);
+        // It is possible for collision properties method to change whether or not the item is solid.
+        if (!item.isSolid() || !target.isSolid()) {
+          continue;
+        }
+        item.move(item.vel().clone().negate());
       }
     }
     
@@ -162,8 +161,12 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     
     INSTANCE.gc().fillRect(0, 0, INSTANCE.gc().getCanvas().getWidth(), INSTANCE.gc().getCanvas().getHeight());
     
+    // TODO: Apply depending on room state.
+    INSTANCE.gc().drawImage(Backgrounds.DEFAULT, 0, 0);
+    INSTANCE.gc().drawImage(Backgrounds.BLOCKED, 0, 0);
+    
     // Render all map items and process animations.
-    for (MapItem item : INSTANCE.getRun().getCurrentRoom().mapItems()) {
+    for (MapItem item : INSTANCE.getRun().getCurrentRoom().getItems().all()) {
       if (item == null) {
         continue;
       }

@@ -61,6 +61,20 @@ public class Projectile extends MapItem {
     height += add;
   }
   
+  @Override
+  public void collisionProperties(final Game INSTANCE, MapItem collision) {
+    INSTANCE.getRun().getCurrentRoom().getItems().removeProj(this);
+    if (collision instanceof Entity) {
+      // TODO: Entity collision logic.
+    }
+  }
+
+  @Override
+  public boolean collisionValid(final Game INSTANCE, MapItem collision) {
+    // TODO: Set and filter immune entities.
+    return !(collision instanceof PlayableCharacter);
+  }
+  
   public double getWidth() {
     return width;
   }

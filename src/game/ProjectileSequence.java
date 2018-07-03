@@ -14,12 +14,10 @@ public interface ProjectileSequence {
   }
   
   public default void generate(Projectile proj, Game instance) {
-    proj.setSolid(false);
     instance.getRun().getPlayer().setWeaponCooldown(1);
-    instance.getRun().getCurrentRoom().mapItems().add(proj);
+    instance.getRun().getCurrentRoom().getItems().addProj(proj);
   }
   
-  // TODO: Determine if additional arguments are needed.
   public default void behaviour(Projectile proj) {
     switch (proj.dir()) {
     case UP:

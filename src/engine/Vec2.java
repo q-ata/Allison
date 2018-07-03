@@ -48,6 +48,14 @@ public final class Vec2 {
   }
   
   /**
+   * Adds the two coordinates of this vector.
+   * @return The sum of this vector's x and y.
+   */
+  public double sum() {
+    return x() + y();
+  }
+  
+  /**
    * Subtracts the points of the provided vector from this vector.
    * @param vec2 The vector to be subtracted.
    * @return This vector.

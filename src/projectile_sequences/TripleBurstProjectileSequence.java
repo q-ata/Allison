@@ -13,7 +13,7 @@ public class TripleBurstProjectileSequence implements ProjectileSequence {
   public void generate(Projectile proj, Game instance) {
     proj.setSolid(false);
     instance.getRun().getPlayer().setWeaponCooldown(1);
-    instance.getRun().getCurrentRoom().mapItems().add(proj);
+    instance.getRun().getCurrentRoom().getItems().addProj(proj);
     instance.getRun().addScheduler(new Runnable() {
       @Override
       public void run() {
@@ -22,7 +22,7 @@ public class TripleBurstProjectileSequence implements ProjectileSequence {
           Projectile projec = locate(proj.dir(), instance, instance.getRun().getPlayer().getWeapon().getData());
           projec.setSolid(false);
           instance.getRun().getPlayer().setWeaponCooldown(1);
-          instance.getRun().getCurrentRoom().mapItems().add(projec);
+          instance.getRun().getCurrentRoom().getItems().addProj(projec);
           if (++generated == 3) {
             instance.getRun().removeScheduler(this);
             generated = 1;

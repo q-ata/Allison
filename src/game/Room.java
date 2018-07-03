@@ -8,7 +8,7 @@ public class Room {
   private final int ID;
   private PlayableCharacter player;
   
-  private List<MapItem> mapItems = new ArrayList<MapItem>();
+  private MapItemStore items = new MapItemStore();
   
   private boolean visited = false;
   private boolean cleared = false;
@@ -16,7 +16,7 @@ public class Room {
   public Room(int id, PlayableCharacter player) {
     ID = id;
     this.player = player;
-    mapItems().add(getPlayer());
+    getItems().all().add(getPlayer());
     // TODO: Load room based on ID.
   }
 
@@ -27,11 +27,15 @@ public class Room {
   public PlayableCharacter getPlayer() {
     return player;
   }
-
-  public List<MapItem> mapItems() {
-    return mapItems;
+  
+  public MapItemStore getItems() {
+    return items;
   }
 
+  public void setItems(MapItemStore items) {
+    this.items = items;
+  }
+  
   public boolean isVisited() {
     return visited;
   }

@@ -63,6 +63,11 @@ public class AnimationSequence {
     }
     setFrameTime(0);
   }
+  
+  public void reset() {
+    currentFrame = getSprites().length == 1 ? 0 : 1;
+    setFrameTime(0);
+  }
 
   public Image[] getSprites() {
     return sprites;

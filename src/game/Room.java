@@ -1,8 +1,5 @@
 package game;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Room {
   
   private final int ID;
@@ -16,7 +13,7 @@ public class Room {
   public Room(int id, PlayableCharacter player) {
     ID = id;
     this.player = player;
-    getItems().all().add(getPlayer());
+    // getItems().all().add(getPlayer());
     // TODO: Load room based on ID.
   }
 

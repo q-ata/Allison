@@ -1,5 +1,6 @@
 package game.entities;
 
+import engine.Convex;
 import engine.Vec2;
 import game.Entity;
 import game.Game;
@@ -16,7 +17,7 @@ public class Fly extends Entity {
   private int idleTime = 0;
 
   public Fly(Vec2 pos) {
-    super(pos, "enemies/fly/damaged"); 
+    super(pos, "enemies/fly/damaged", 10); 
   }
   
   @Override
@@ -33,7 +34,7 @@ public class Fly extends Entity {
       double d = Math.sqrt(Math.pow(diff.x(), 2) + Math.pow(diff.y(), 2));
       double t = d / 2.2;
       
-      newVel.set(diff.x() / t, diff.y() / t);
+      newVel.add(new Vec2(diff.x() / t, diff.y() / t));
     }
     else {
       if (hitInterval >= requiredInterval && ++idleTime > idleLimit) {
@@ -59,12 +60,9 @@ public class Fly extends Entity {
   }
   
   @Override
-  public void collisionProperties(final Game INSTANCE, MapItem collision) {
+  public boolean collisionProperties(final Game INSTANCE, MapItem collision) {
     if (!(collision instanceof PlayableCharacter)) {
-      if (isSolid()) {
-        setSolid(false);
-      }
-      return;
+      return false;
     }
     needsIdle = true;
     idleTime = 0;
@@ -72,12 +70,15 @@ public class Fly extends Entity {
     requiredInterval = (int) Math.floor(Math.random() * 60) + 60;
     hitInterval = 0;
     dir = new Vec2(Math.floor(Math.random() * 2) + 2, Math.floor(Math.random() * 2) + 1);
-    if (Math.random() < 0.5) {
+    Convex fly = getHitbox().getShapes()[0];
+    // TODO: Fly will still get stuck sometimes. https://i.imgur.com/5yYAFN9.png
+    if (fly.getFarthestPoint(new Vec2(1, 0)).x() <= collision.getHitbox().getShapes()[0].getFarthestPoint(new Vec2(-1, 0)).x()) {
       dir.setX(-dir.x());
     }
-    if (Math.random() < 0.5) {
+    if (fly.getFarthestPoint(new Vec2(0, 1)).y() <= collision.getHitbox().getShapes()[0].getFarthestPoint(new Vec2(0, -1)).y()) {
       dir.setY(-dir.y());
     }
+    return true;
   }
 
 }

@@ -1,5 +1,6 @@
 package game;
 
+import engine.audio.AudioManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -20,10 +21,11 @@ public final class Game extends Application {
   private GraphicsContext gc;
   private boolean started = false;
   
-  private final int WINDOW_WIDTH = 960;
-  private final int WINDOW_HEIGHT = 540;
+  public final int WINDOW_WIDTH = 960;
+  public final int WINDOW_HEIGHT = 540;
   
   private Run run;
+  private AudioManager audio = new AudioManager();
   
   public void initGame() {
     launch();
@@ -100,6 +102,14 @@ public final class Game extends Application {
 
   public void setRun(Run run) {
     this.run = run;
+  }
+
+  public AudioManager getAudio() {
+    return audio;
+  }
+
+  public void setAudio(AudioManager audio) {
+    this.audio = audio;
   }
 
 }

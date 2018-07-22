@@ -2,8 +2,8 @@ package game;
 
 public interface Collider {
   
-  public default void collisionProperties(final Game INSTANCE, MapItem collision) {
-    return;
+  public default boolean collisionProperties(final Game INSTANCE, MapItem collision) {
+    return true;
   }
   
   public default boolean collisionValid(final Game INSTANCE, MapItem collision) {

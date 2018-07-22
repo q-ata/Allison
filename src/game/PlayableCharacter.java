@@ -2,7 +2,7 @@ package game;
 
 import engine.Vec2;
 
-public class PlayableCharacter extends Killable {
+public class PlayableCharacter extends Entity {
   
   // fire rate boost.
   // fire rate multiplier.

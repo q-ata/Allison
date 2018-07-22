@@ -8,23 +8,23 @@ import engine.Vec2;
 public class Projectile extends MapItem {
   
   private ProjectileData proj;
-  private int[] immune;
   private ProjectileSequence seq;
   private double width;
   private double height;
+  private MapItem firer;
   
-  public Projectile(Vec2 pos, ProjectileData data, Stats stats, int[] immune, Direction dir, ProjectileSequence seq) {
+  public Projectile(Vec2 pos, ProjectileData data, Stats stats, MapItem firer, Direction dir, ProjectileSequence seq) {
     super(data.sprites().get(dir), pos);
-    init(data, stats, immune, dir, seq);
+    init(data, stats, firer, dir, seq);
   }
   
-  public Projectile(Vec2 pos, ProjectileData data, Stats stats, Direction dir, ProjectileSequence seq) {
+  public Projectile(Vec2 pos, ProjectileData data, Stats stats, PlayableCharacter player, Direction dir, ProjectileSequence seq) {
     super(data.sprites().get(dir), pos);
-    init(data, stats, new int[] {}, dir, seq);
+    init(data, stats, player, dir, seq);
   }                                                                                                                                                                                                                          
   
-  private void init(ProjectileData data, Stats stats, int[] immune, Direction dir, ProjectileSequence seq) {
-    setImmune(immune);
+  private void init(ProjectileData data, Stats stats, MapItem firer, Direction dir, ProjectileSequence seq) {
+    setFirer(firer);
     setSeq(seq);
     proj = new ProjectileData(data.rateBoost() + stats.rateBoost(), data.rateMulti() + stats.rateMulti(),
         data.speedBoost() + stats.speedBoost(), data.speedMulti() + stats.speedMulti(), data.damageBoost() + stats.damageBoost(),
@@ -62,17 +62,23 @@ public class Projectile extends MapItem {
   }
   
   @Override
-  public void collisionProperties(final Game INSTANCE, MapItem collision) {
+  public boolean collisionProperties(final Game INSTANCE, MapItem collision) {
+    if (collision instanceof Projectile || collision.equals(getFirer())) {
+      return false;
+    }
     INSTANCE.getRun().getCurrentRoom().getItems().removeProj(this);
     if (collision instanceof Entity) {
-      // TODO: Entity collision logic.
+      Entity killable = (Entity) collision;
+      if (killable.takeDamage((int) (proj().damageBoost() * proj().damageMulti()))) {
+        INSTANCE.getRun().getCurrentRoom().getItems().removeEntity(killable);
+      }
     }
+    return true;
   }
-
+  
   @Override
   public boolean collisionValid(final Game INSTANCE, MapItem collision) {
-    // TODO: Set and filter immune entities.
-    return !(collision instanceof PlayableCharacter);
+    return !collision.equals(getFirer());
   }
   
   public double getWidth() {
@@ -87,20 +93,20 @@ public class Projectile extends MapItem {
     return proj;
   }
 
-  public int[] getImmune() {
-    return immune;
-  }
-
-  public void setImmune(int[] immune) {
-    this.immune = immune;
-  }
-
   public ProjectileSequence seq() {
     return seq;
   }
 
   public void setSeq(ProjectileSequence seq) {
     this.seq = seq;
+  }
+
+  public MapItem getFirer() {
+    return firer;
+  }
+
+  public void setFirer(MapItem firer) {
+    this.firer = firer;
   }
   
 }

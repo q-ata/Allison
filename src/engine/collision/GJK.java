@@ -1,104 +1,84 @@
 package engine.collision;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import engine.Convex;
 import engine.Vec2;
 
-/**
- * Provides methods to check for collisions between 2 convex 2D polygons.
- */
 public class GJK {
   
-  /**
-   * Check whether or not 2 convex polygons intersect.
-   * @param a The first polygon to check.
-   * @param b The second polygon to check.
-   * @return Whether or not the polygons are intersecting.
-   */
-  public static boolean intersects(final Convex a, final Convex b) {
-    final List<Vec2> simplex = new ArrayList<Vec2>();
-    final Vec2 direction = new Vec2(1.0, 0.0);
-    simplex.add(minkowski(a, b, direction));
-    direction.negate();
+  private static Vec2 tripleProduct(Vec2 a, Vec2 b, Vec2 c) {
+    double ac = a.dot(c);
+    double bc = b.dot(c);
+    return new Vec2((b.x() * ac) - (a.x() * bc), (b.y() * ac) - (a.y() * bc));
+  }
+  
+  private static Vec2 support(Convex shape1, Convex shape2, Vec2 dir) {
+    return shape1.getFarthestPoint(dir).clone().sub(shape2.getFarthestPoint(dir.clone().negate()));
+  }
+  
+  public static boolean intersects(Convex shape1, Convex shape2) {
+    int index = 0;
+    Vec2 pos1 = shape1.getCenter();
+    Vec2 pos2 = shape2.getCenter();
     
-    while (true) {
-      Vec2 point = minkowski(a, b, direction);
-      if (point.dot(direction) < 0) {
-        return false;
-      }
-      
-      simplex.add(point);
-      
-      if (evaluate(simplex, direction)) {
-        return true;
-      }
+    Vec2 d = pos1.clone().sub(pos2);
+    
+    if (d.x() == 0 && d.y() == 0) {
+      d.setX(1);
     }
-  }
-  
-  private static Vec2 minkowski(final Convex a, final Convex b, final Vec2 direction) {
-    final Vec2 result = a.getFarthestPoint(direction);
-    result.sub(b.getFarthestPoint(direction.clone().negate()));
-    return result;
-  }
-  
-  private static boolean sameDirection(final Vec2 a, final Vec2 b) {
-    return a.dot(b) > 0;
-  }
-  
-  private static Vec2 createVector(final Vec2 a, final Vec2 b) {
-    return new Vec2(b.x() - a.x(), b.y() - a.y());
-  }
-  
-  private static boolean evaluate(List<Vec2> simplex, Vec2 direction) {
-    if (simplex.size() == 2) {
-      final Vec2 a = simplex.get(1);
-      final Vec2 b = simplex.get(0);
-      
-      final Vec2 ao = createVector(a, new Vec2());
-      final Vec2 ab = createVector(a, b);
-      
-      direction.set(-ab.y(), ab.x());
-      if (!sameDirection(direction, ao)) {
-        direction.negate();
-      }
-      
+    
+    Vec2[] simplex = new Vec2[3];
+    Vec2 a = support(shape1, shape2, d);
+    simplex[0] = a;
+    
+    if (a.dot(d) <= 0) {
       return false;
     }
-    else if (simplex.size() == 3) {
-      final Vec2 a = simplex.get(2);
-      final Vec2 b = simplex.get(1);
-      final Vec2 c = simplex.get(0);
+    
+    d = a.clone().negate();
+    
+    while (true) {
+      a = support(shape1, shape2, d);
+      simplex[++index] = a;
       
-      final Vec2 ao = createVector(a, new Vec2());
-      final Vec2 ab = createVector(a, b);
-      final Vec2 ac = createVector(a, c);
-      
-      direction.set(-ab.y(), ab.x());
-      if (sameDirection(direction, c)) {
-        direction.negate();
-      }
-      
-      if (sameDirection(direction, ao)) {
-        simplex.remove(0);
+      if (a.dot(d) <= 0) {
         return false;
       }
       
-      direction.set(-ac.y(), ac.x());
-      if (sameDirection(direction, b)) {
-        direction.negate();
+      Vec2 ao = a.clone().negate();
+      Vec2 b;
+      Vec2 ab;
+      
+      if (index < 2) {
+        b = simplex[0];
+        ab = b.clone().sub(a);
+        d = tripleProduct(ab, ao, ab);
+        if (d.dot(d) == 0) {
+          d = new Vec2(ab.y(), -ab.x());
+        }
+        continue;
       }
       
-      if (sameDirection(direction, ao)) {
-        simplex.remove(1);
-        return false;
-      }
+      b = simplex[1];
+      Vec2 c = simplex[0];
+      ab = b.clone().sub(a);
+      Vec2 ac = c.clone().sub(a);
       
-      return true;
+      Vec2 acp = tripleProduct(ab, ac, ac);
+      
+      if (acp.dot(ao) >= 0) {
+        d = acp;
+      }
+      else {
+        Vec2 abp = tripleProduct(ac, ab, ab);
+        if (abp.dot(ao) < 0) {
+          return true;
+        }
+        simplex[0] = simplex[1];
+        d = abp;
+      }
+      simplex[1] = simplex[2];
+      --index;
     }
-    System.out.println("Invalid simplex!");
-    return false;
   }
-  
+
 }

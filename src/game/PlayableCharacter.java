@@ -1,6 +1,7 @@
 package game;
 
 import engine.Vec2;
+import game.structures.Entity;
 
 public class PlayableCharacter extends Entity {
   

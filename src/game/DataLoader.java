@@ -1,8 +1,12 @@
 package game;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import engine.Vec2;
+import game.constants.Direction;
+import game.structures.Entity;
+import game.structures.MapItem;
 import javafx.scene.image.Image;
 
 // Reads and loads MapItemData from a local data file.
@@ -49,7 +53,8 @@ public final class DataLoader {
     AnimationSequence[] sequences = loadSequences(path);
     String boxPath = reader.readLine();
     reader.close();
-    return new MapItemData(sequences, new Hitbox(boxPath));
+    MapItemData i = new MapItemData(sequences, new Hitbox(boxPath));
+    return i;
   }
   
   public static Vec2 loadHudWeaponSpriteOffset(String path) {
@@ -107,6 +112,29 @@ public final class DataLoader {
     return new ProjectileData(rateBoost, rateMulti, speedBoost, speedMulti, damageBoost, damageMulti,
         rangeBoost, rangeMulti, scaleBoost, scaleMulti, new ProjectileSprites(upData, downData, leftData, rightData));
     
+  }
+  
+  public static Room loadRoom(int id, Vec2 coord, PlayableCharacter player) {
+    reader = new DataFileReader("rooms/" + id);
+    Room room = new Room(coord, id, player);
+    int itemCount = Integer.parseInt(reader.readLine());
+    for (int i = 0; i < itemCount; i++) {
+      Class<?> c = MapItem.classMap().get(reader.readLine());
+      try {
+        MapItem item = (MapItem) c.getDeclaredConstructor(Vec2.class).newInstance(new Vec2(Integer.parseInt(reader.readLine()), Integer.parseInt(reader.readLine())));
+        if (item instanceof Entity) {
+          room.getItems().addEntity((Entity) item);
+        }
+        else {
+          room.getItems().addBlock(item);
+        }
+      }
+      catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+          | NoSuchMethodException | SecurityException e) {
+        e.printStackTrace();
+      }
+    }
+    return room;
   }
 
 }

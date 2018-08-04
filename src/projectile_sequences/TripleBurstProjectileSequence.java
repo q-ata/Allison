@@ -1,8 +1,8 @@
 package projectile_sequences;
 
 import game.Game;
-import game.Projectile;
 import game.ProjectileSequence;
+import game.structures.Projectile;
 
 public class TripleBurstProjectileSequence implements ProjectileSequence {
   

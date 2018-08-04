@@ -1,7 +1,7 @@
 package game.blocks;
 
 import engine.Vec2;
-import game.MapItem;
+import game.structures.MapItem;
 
 public class BasicRock extends MapItem {
 

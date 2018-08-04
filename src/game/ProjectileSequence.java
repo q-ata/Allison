@@ -1,6 +1,8 @@
 package game;
 
 import engine.Vec2;
+import game.constants.Direction;
+import game.structures.Projectile;
 
 public interface ProjectileSequence {
   

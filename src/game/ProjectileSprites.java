@@ -1,5 +1,7 @@
 package game;
 
+import game.constants.Direction;
+
 public class ProjectileSprites {
   
   private MapItemData up;

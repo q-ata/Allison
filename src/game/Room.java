@@ -1,5 +1,11 @@
 package game;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import engine.Vec2;
+import game.blocks.RoomTransitioner;
+
 public class Room {
   
   private final int ID;
@@ -9,18 +15,20 @@ public class Room {
   
   private boolean visited = false;
   private boolean cleared = false;
+  private Vec2 coord;
+  private List<RoomTransitioner> rts = new ArrayList<RoomTransitioner>(4);
   
-  public Room(int id, PlayableCharacter player) {
+  public Room(Vec2 coord, int id, PlayableCharacter player) {
+    this.setCoord(coord);
     ID = id;
     this.player = player;
-    // getItems().all().add(getPlayer());
-    // TODO: Load room based on ID.
   }
 
   public int getID() {
     return ID;
   }
 
+  // TODO: Why does Room need a player instance?
   public PlayableCharacter getPlayer() {
     return player;
   }
@@ -47,6 +55,22 @@ public class Room {
 
   public void setCleared(boolean cleared) {
     this.cleared = cleared;
+  }
+
+  public Vec2 coord() {
+    return coord;
+  }
+
+  public void setCoord(Vec2 coord) {
+    this.coord = coord;
+  }
+
+  public List<RoomTransitioner> getRts() {
+    return rts;
+  }
+
+  public void setRts(List<RoomTransitioner> rts) {
+    this.rts = rts;
   }
 
 }

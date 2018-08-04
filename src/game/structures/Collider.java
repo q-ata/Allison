@@ -1,4 +1,6 @@
-package game;
+package game.structures;
+
+import game.Game;
 
 public interface Collider {
   

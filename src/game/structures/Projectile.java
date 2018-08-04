@@ -1,9 +1,16 @@
-package game;
+package game.structures;
 
 import engine.Circle;
 import engine.Convex;
 import engine.Shape;
 import engine.Vec2;
+import game.Game;
+import game.PlayableCharacter;
+import game.ProjectileData;
+import game.ProjectileSequence;
+import game.Stats;
+import game.blocks.RoomTransitioner;
+import game.constants.Direction;
 
 public class Projectile extends MapItem {
   
@@ -71,6 +78,10 @@ public class Projectile extends MapItem {
       Entity killable = (Entity) collision;
       if (killable.takeDamage((int) (proj().damageBoost() * proj().damageMulti()))) {
         INSTANCE.getRun().getCurrentRoom().getItems().removeEntity(killable);
+        if (INSTANCE.getRun().getCurrentRoom().getItems().entities().size() == 0) {
+          INSTANCE.getRun().getCurrentRoom().setCleared(true);
+          RoomTransitioner.setOpen(true);
+        }
       }
     }
     return true;

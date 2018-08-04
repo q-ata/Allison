@@ -3,6 +3,10 @@ package game;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.structures.Entity;
+import game.structures.MapItem;
+import game.structures.Projectile;
+
 public class MapItemStore {
 
   private List<MapItem> all = new ArrayList<MapItem>();

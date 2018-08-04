@@ -1,7 +1,7 @@
 package game.schedulers;
 
-import game.Entity;
 import game.Run;
+import game.structures.Entity;
 
 public class RemoveInvincibility implements Runnable {
   

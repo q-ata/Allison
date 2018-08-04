@@ -2,10 +2,10 @@ package game.entities;
 
 import engine.Convex;
 import engine.Vec2;
-import game.Entity;
 import game.Game;
-import game.MapItem;
 import game.PlayableCharacter;
+import game.structures.Entity;
+import game.structures.MapItem;
 
 public class Fly extends Entity {
   

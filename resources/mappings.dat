@@ -1,7 +1,16 @@
-3
+5
 PlayableCharacter
+game.PlayableCharacter
 characters/main/build
 BasicRock
+game.blocks.BasicRock
 blocks/basic_rock/build
 Fly
+game.entities.Fly
 enemies/fly/build
+RoomTransitionerX
+game.blocks.RoomTransitionerX
+blocks/room_transitioner/buildx
+RoomTransitionerY
+game.blocks.RoomTransitionerY
+blocks/room_transitioner/buildy

@@ -1,8 +1,12 @@
-package game;
+package game.structures;
 
 import java.util.HashMap;
 
 import engine.Vec2;
+import game.AnimationSequence;
+import game.DataLoader;
+import game.Run;
+import game.constants.Direction;
 import game.schedulers.RemoveInvincibility;
 
 public abstract class Entity extends MapItem implements AI {

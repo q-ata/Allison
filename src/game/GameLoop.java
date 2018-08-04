@@ -8,8 +8,12 @@ import engine.GameProcess;
 import engine.KeyboardInputs;
 import engine.Shape;
 import engine.Vec2;
-import game.blocks.BasicRock;
-import game.entities.Fly;
+import game.constants.Backgrounds;
+import game.constants.Direction;
+import game.constants.HUDSprites;
+import game.structures.Entity;
+import game.structures.MapItem;
+import game.structures.Projectile;
 import game.weapons.TestWeapon;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -26,13 +30,6 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     PlayableCharacter player = new PlayableCharacter();
     player.setWeapon(new TestWeapon(INSTANCE));
     INSTANCE.setRun(new Run(System.nanoTime(), player));
-    // TODO: Remove later.
-    BasicRock rock = new BasicRock(new Vec2(200, 150));
-    Fly fly = new Fly(new Vec2(150, 350));
-    INSTANCE.getRun().getCurrentRoom().getItems().addBlock(rock);
-    INSTANCE.getRun().getCurrentRoom().getItems().addBlock(new BasicRock(new Vec2(600, 250)));
-    INSTANCE.getRun().getCurrentRoom().getItems().addBlock(new BasicRock(new Vec2(400, 150)));
-    INSTANCE.getRun().getCurrentRoom().getItems().addEntity(fly);
     
     // Assign audio index and use when firing (in method: handleProjectileInput).
     INSTANCE.getAudio().register("resources/weapons/test_weapon/shot/effect");

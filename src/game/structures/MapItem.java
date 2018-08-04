@@ -1,4 +1,4 @@
-package game;
+package game.structures;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,11 +7,18 @@ import engine.Circle;
 import engine.Convex;
 import engine.Shape;
 import engine.Vec2;
+import game.AnimationSequence;
+import game.DataFileReader;
+import game.DataLoader;
+import game.Hitbox;
+import game.MapItemData;
+import game.constants.Direction;
 import javafx.scene.image.Image;
 
 public abstract class MapItem implements Collider {
   
-  private static Map<String, MapItemData> dataMap = populateDataMap();
+  private static final Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
+  private static final Map<String, MapItemData> dataMap = populateDataMap();
   
   // Direction : AnimationSequence hashmap for each direction that should be animated.
   private HashMap<Direction, AnimationSequence> spriteSet = new HashMap<Direction, AnimationSequence>();
@@ -72,11 +79,15 @@ public abstract class MapItem implements Collider {
   
   private static Map<String, MapItemData> populateDataMap() {
     try {
-      Map<String, MapItemData> map = new HashMap<>();
+      Map<String, MapItemData> map = new HashMap<String, MapItemData>();
       DataFileReader reader = new DataFileReader("mappings");
       int mapCount = Integer.parseInt(reader.readLine());
       for (int i = 0; i < mapCount; i++) {
-        map.put(reader.readLine(), DataLoader.loadMapItem(reader.readLine()));
+        String simpleName = reader.readLine();
+        String qualName = reader.readLine();
+        String path = reader.readLine();
+        map.put(simpleName, DataLoader.loadMapItem(path));
+        classMap.put(simpleName, Class.forName(qualName));
       }
       reader.close();
       return map;
@@ -85,6 +96,10 @@ public abstract class MapItem implements Collider {
       e.printStackTrace();
       return null;
     }
+  }
+  
+  public static Map<String, Class<?>> classMap() {
+    return classMap;
   }
   
   public Image getCurrentSprite() {

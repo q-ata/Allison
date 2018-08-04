@@ -1,5 +1,6 @@
 package game;
 
+import game.constants.Direction;
 import javafx.scene.image.Image;
 
 public class AnimationSequence {

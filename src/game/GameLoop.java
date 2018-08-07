@@ -33,6 +33,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     
     // Assign audio index and use when firing (in method: handleProjectileInput).
     INSTANCE.getAudio().register("resources/weapons/test_weapon/shot/effect");
+    INSTANCE.tui().updateMinimap();
   }
   
   private void handleProjectileInput() {
@@ -243,14 +244,18 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     drawHitbox(player);
     
     // Render HUD.
-    INSTANCE.gc().drawImage(HUDSprites.HUDBASE, 3, 3);
+    INSTANCE.gc().drawImage(HUDSprites.HUD_BASE, 3, 3);
     // Render health and mana bar depending on amount remaining.
-    INSTANCE.gc().drawImage(HUDSprites.HUDHEALTH, 0, 0, 127, 11, 66, 24, (int) Math.round(127d / (100d / INSTANCE.getRun().getPlayer().getHealth())), 11);
+    INSTANCE.gc().drawImage(HUDSprites.HUD_HEALTH, 0, 0, 127, 11, 66, 24, (int) Math.round(127d / (100d / INSTANCE.getRun().getPlayer().getHealth())), 11);
     Weapon weapon = INSTANCE.getRun().getPlayer().getWeapon();
-    INSTANCE.gc().drawImage(HUDSprites.HUDMANA, 0, 0, 123, 6, 66, 40, (int) Math.round(123d / (100d / weapon.getMana())), 6);
+    INSTANCE.gc().drawImage(HUDSprites.HUD_MANA, 0, 0, 123, 6, 66, 40, (int) Math.round(123d / (100d / weapon.getMana())), 6);
     
     // Render weapon sprite in HUD.
     INSTANCE.gc().drawImage(weapon.getHudSprite(), 10 + weapon.getHudOffset().x(), 10 + weapon.getHudOffset().y());
+    
+    if (KeyboardInputs.KEYMAP.get(KeyCode.TAB)) {
+      INSTANCE.tui().render();
+    }
     
   }
 

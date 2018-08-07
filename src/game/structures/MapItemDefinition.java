@@ -21,7 +21,8 @@ public class MapItemDefinition {
       clazz = Class.forName(name);
       return (MapItem) clazz.getDeclaredConstructor(MapItemData.class, Vec2.class)
           .newInstance(data, pos);
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException |
+    }
+    catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException |
         InvocationTargetException | NoSuchMethodException | SecurityException e) {
       e.printStackTrace();
       return null;

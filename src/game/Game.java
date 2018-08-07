@@ -26,6 +26,7 @@ public final class Game extends Application {
   
   private Run run;
   private AudioManager audio = new AudioManager();
+  private TabUI tui = new TabUI(this);
   
   public void initGame() {
     launch();
@@ -110,6 +111,10 @@ public final class Game extends Application {
 
   public void setAudio(AudioManager audio) {
     this.audio = audio;
+  }
+
+  public TabUI tui() {
+    return tui;
   }
 
 }

@@ -29,11 +29,11 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     INSTANCE = instance;
     PlayableCharacter player = new PlayableCharacter();
     player.setWeapon(new TestWeapon(INSTANCE));
-    INSTANCE.setRun(new Run(System.nanoTime(), player));
+    INSTANCE.setRun(new Run(System.nanoTime(), INSTANCE, player));
+    INSTANCE.getRun().setCurrentRoom(INSTANCE.getRun().getCurrentPos());
     
     // Assign audio index and use when firing (in method: handleProjectileInput).
     INSTANCE.getAudio().register("resources/weapons/test_weapon/shot/effect");
-    INSTANCE.tui().updateMinimap();
   }
   
   private void handleProjectileInput() {
@@ -94,25 +94,25 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
       if (main.dir() != Direction.UP) {
         main.setDir(Direction.UP);
       }
-      main.vel().set(0, -2.5);
+      main.vel().set(0, -2.8);
     }
     else if (KeyboardInputs.KEYMAP.get(KeyCode.S)) {
       if (main.dir() != Direction.DOWN) {
         main.setDir(Direction.DOWN);
       }
-      main.vel().set(0, 2.5);
+      main.vel().set(0, 2.8);
     }
     else if (KeyboardInputs.KEYMAP.get(KeyCode.A)) {
       if (main.dir() != Direction.LEFT) {
         main.setDir(Direction.LEFT);
       }
-      main.vel().set(-2.5, 0);
+      main.vel().set(-2.8, 0);
     }
     else if (KeyboardInputs.KEYMAP.get(KeyCode.D)) {
       if (main.dir() != Direction.RIGHT) {
         main.setDir(Direction.RIGHT);
       }
-      main.vel().set(2.5, 0);
+      main.vel().set(2.8, 0);
     }
     else {
       advance = false;
@@ -253,6 +253,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     // Render weapon sprite in HUD.
     INSTANCE.gc().drawImage(weapon.getHudSprite(), 10 + weapon.getHudOffset().x(), 10 + weapon.getHudOffset().y());
     
+    // Render additional UI info if Tab key is being held.
     if (KeyboardInputs.KEYMAP.get(KeyCode.TAB)) {
       INSTANCE.tui().render();
     }

@@ -75,7 +75,20 @@ public class LevelGenerator {
       Vec2 c = valid.get(ind);
       valid.remove(ind);
       // Replace 1 with random room ID.
-      Room n = DataLoader.loadRoom(1, c, player);
+      int id = 1;
+      if (q == count - 2) {
+        // Boss ID.
+        id = -1;
+      }
+      else if (q == count - 3) {
+        // Shop ID.
+        id = -2;
+      }
+      else if (q == count - 4) {
+        // Mystery ID.
+        id = -3;
+      }
+      Room n = DataLoader.loadRoom(id, c, player);
       
       Vec2 up = new Vec2(c.x(), c.y() - 1);
       Vec2 down = new Vec2(c.x(), c.y() + 1);

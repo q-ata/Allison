@@ -71,7 +71,7 @@ public class Fly extends Entity {
     hitInterval = 0;
     dir = new Vec2(Math.floor(Math.random() * 2) + 2, Math.floor(Math.random() * 2) + 1);
     Convex fly = getHitbox().getShapes()[0];
-    // TODO: Fly will still get stuck sometimes. https://i.imgur.com/5yYAFN9.png
+    // TODO: Fly will still get stuck on first contact. Probably an issue with initial state.
     if (fly.getFarthestPoint(new Vec2(1, 0)).x() <= collision.getHitbox().getShapes()[0].getFarthestPoint(new Vec2(-1, 0)).x()) {
       dir.setX(-dir.x());
     }

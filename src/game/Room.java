@@ -22,6 +22,9 @@ public class Room {
     this.setCoord(coord);
     ID = id;
     this.player = player;
+    if (getItems().entities().size() == 0) {
+      setCleared(true);
+    }
   }
 
   public int getID() {

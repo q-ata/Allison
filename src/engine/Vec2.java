@@ -188,6 +188,10 @@ public final class Vec2 {
     return new Vec2(x(), y());
   }
   
+  public boolean equals(Vec2 other) {
+    return x() == other.x() && y() == other.y();
+  }
+  
   @Override
   public String toString() {
     return "(" + x() + ", " + y() + ")";

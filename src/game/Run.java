@@ -15,6 +15,7 @@ public class Run {
       (int) Math.floor(Math.random() * 3) + 20};
   
   private final long SEED;
+  private Game instance;
   private PlayableCharacter player;
   
   private Room[][] rooms;
@@ -27,13 +28,13 @@ public class Run {
   
   private LevelGenerator generator = new LevelGenerator();
 
-  public Run(long seed, PlayableCharacter player) {
+  public Run(long seed, Game instance, PlayableCharacter player) {
     SEED = seed;
+    this.instance = instance;
     this.player = player;
     LevelGenerator.Floor data = generator.generateFloor(roomCount[floor], player);
     setRooms(data.rooms);
     setCurrentPos(new Vec2((int) data.spawn.x(), (int) data.spawn.y()));
-    setCurrentRoom(getCurrentPos());
     // TODO: Procedurally generate levels.
   }
   
@@ -80,26 +81,10 @@ public class Run {
     Room room = getRooms()[x][y];
     currentRoom = room;
     if (!room.isCleared()) {
-      RoomTransitioner.setOpen(false);
+      RoomTransitioner.setAllOpen(false, room);
     }
     getPlayer().move(new Vec2(453, 239).sub(getPlayer().pos()));
-    Room[][] rooms = getRooms();
-    Vec2 pPos = getCurrentPos();
-    for (int i = 0; i < rooms.length; i++) {
-      for (int j = 0; j < rooms[0].length; j++) {
-        Room r = rooms[i][j];
-        if (r == null) {
-          System.out.print(" ");
-          continue;
-        }
-        if (i == pPos.x() && j == pPos.y()) {
-          System.out.print("H");
-          continue;
-        }
-        System.out.print("R");
-      }
-      System.out.println();
-    }
+    instance.tui().updateMinimap();
     if (room.getRts().size() != 0) {
       return;
     }

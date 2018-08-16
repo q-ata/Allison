@@ -115,6 +115,10 @@ public final class DataLoader {
   }
   
   public static Room loadRoom(int id, Vec2 coord, PlayableCharacter player) {
+    if (id < 0) {
+      // TODO: Populate special rooms.
+      return new Room(coord, id, player);
+    }
     reader = new DataFileReader("rooms/" + id);
     Room room = new Room(coord, id, player);
     int itemCount = Integer.parseInt(reader.readLine());

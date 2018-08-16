@@ -80,7 +80,7 @@ public class Projectile extends MapItem {
         INSTANCE.getRun().getCurrentRoom().getItems().removeEntity(killable);
         if (INSTANCE.getRun().getCurrentRoom().getItems().entities().size() == 0) {
           INSTANCE.getRun().getCurrentRoom().setCleared(true);
-          RoomTransitioner.setOpen(true);
+          RoomTransitioner.setAllOpen(true, INSTANCE.getRun().getCurrentRoom());
         }
       }
     }

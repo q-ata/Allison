@@ -1,6 +1,7 @@
 package game;
 
 import engine.Vec2;
+import game.structures.Ability;
 import game.structures.Entity;
 
 public class PlayableCharacter extends Entity {
@@ -19,8 +20,13 @@ public class PlayableCharacter extends Entity {
   private Weapon weapon;
   private int weaponCooldown = 0;
   
+  private Ability abilA;
+  private Ability abilB;
+  
+  private double moveSpeed = 2.8;
+  
   public PlayableCharacter() {
-    super(new Vec2(453, 239), "characters/main/damaged");
+    super(new Vec2(), "characters/main/damaged");
   }
   
   public int increaseWeaponCooldown() {
@@ -50,6 +56,30 @@ public class PlayableCharacter extends Entity {
 
   public void setWeaponCooldown(int weaponCooldown) {
     this.weaponCooldown = weaponCooldown;
+  }
+
+  public Ability getAbilA() {
+    return abilA;
+  }
+
+  public void setAbilA(Ability abilA) {
+    this.abilA = abilA;
+  }
+
+  public Ability getAbilB() {
+    return abilB;
+  }
+
+  public void setAbilB(Ability abilB) {
+    this.abilB = abilB;
+  }
+
+  public double getMoveSpeed() {
+    return moveSpeed;
+  }
+
+  public void setMoveSpeed(double moveSpeed) {
+    this.moveSpeed = moveSpeed;
   }
   
 }

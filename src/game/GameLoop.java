@@ -14,6 +14,7 @@ import game.constants.HUDSprites;
 import game.structures.Entity;
 import game.structures.MapItem;
 import game.structures.Projectile;
+import game.structures.Scheduler;
 import game.weapons.TestWeapon;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -80,48 +81,39 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   public void input() {
     
     handleProjectileInput();
-    for (Runnable runnable : INSTANCE.getRun().getSchedulers()) {
-      runnable.run();
+    for (Scheduler s : INSTANCE.getRun().getSchedulers()) {
+      s.inc();
     }
-    for (Runnable runnable : INSTANCE.getRun().toRemove()) {
-      INSTANCE.getRun().getSchedulers().remove(runnable);
+    for (Scheduler s : INSTANCE.getRun().toRemove()) {
+      INSTANCE.getRun().getSchedulers().remove(s);
     }
     INSTANCE.getRun().toRemove().clear();
     
-    MapItem main = INSTANCE.getRun().getPlayer();
-    boolean advance = true;
-    if (KeyboardInputs.KEYMAP.get(KeyCode.W)) {
-      if (main.dir() != Direction.UP) {
-        main.setDir(Direction.UP);
-      }
-      main.vel().set(0, -2.8);
+    PlayableCharacter main = INSTANCE.getRun().getPlayer();
+    // TODO: Change movement system so any direction can be overridden.
+    boolean up = KeyboardInputs.KEYMAP.get(KeyCode.W);
+    boolean down = KeyboardInputs.KEYMAP.get(KeyCode.S);
+    boolean left = KeyboardInputs.KEYMAP.get(KeyCode.A);
+    boolean right = KeyboardInputs.KEYMAP.get(KeyCode.D);
+    if (up && main.dir() != Direction.UP) {
+      main.setDir(Direction.UP);
     }
-    else if (KeyboardInputs.KEYMAP.get(KeyCode.S)) {
-      if (main.dir() != Direction.DOWN) {
-        main.setDir(Direction.DOWN);
-      }
-      main.vel().set(0, 2.8);
+    else if (down && main.dir() != Direction.DOWN) {
+      main.setDir(Direction.DOWN);
     }
-    else if (KeyboardInputs.KEYMAP.get(KeyCode.A)) {
-      if (main.dir() != Direction.LEFT) {
-        main.setDir(Direction.LEFT);
-      }
-      main.vel().set(-2.8, 0);
+    else if (left && main.dir() != Direction.LEFT) {
+      main.setDir(Direction.LEFT);
     }
-    else if (KeyboardInputs.KEYMAP.get(KeyCode.D)) {
-      if (main.dir() != Direction.RIGHT) {
-        main.setDir(Direction.RIGHT);
-      }
-      main.vel().set(2.8, 0);
+    else if (right && main.dir() != Direction.RIGHT) {
+      main.setDir(Direction.RIGHT);
     }
-    else {
-      advance = false;
-    }
-    if (advance && !main.isMoving()) {
+    if ((up || down || left || right) && !main.isMoving()) {
       main.getSpriteSet().get(main.dir()).advanceAnimation();
       main.setMoving(true);
+      Vec2 mov = MapItem.calculateVelocity(main.dir(), main.getMoveSpeed());
+      main.vel().set(mov.x(), mov.y());
     }
-    else if (!advance){
+    else if (!(up || down || left || right)) {
       main.getSpriteSet().get(main.dir()).reset();
       main.setMoving(false);
       main.setVel(new Vec2());
@@ -138,6 +130,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     if (player.vel().sum() != 0.0) {
       player.move(player.vel());
     }
+    //System.out.println(player.pos());
     
     List<MapItem> all = INSTANCE.getRun().getCurrentRoom().getItems().all();
     
@@ -166,6 +159,12 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
           item.move(item.vel().clone().negate());
         }
       }
+      
+      // MapItem border collision.
+      if (item.pos().x() < 10 || item.pos().x() + item.getHitbox().getWidth() > INSTANCE.WINDOW_WIDTH - 10 ||
+          item.pos().y() < 10 || item.pos().y() + item.getHitbox().getHeight() > INSTANCE.WINDOW_HEIGHT - 10) {
+        item.move(item.vel().clone().negate());
+      }
     }
     
     for (Entity e : INSTANCE.getRun().getCurrentRoom().getItems().entities()) {
@@ -177,6 +176,12 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
         }
       }
       e.ai(INSTANCE);
+    }
+    
+    // Player border collision. Coordinates seem to be shifted for some reason so values are changed to compensate.
+    if (player.pos().x() < 2 || player.pos().x() + player.getHitbox().getWidth() > INSTANCE.WINDOW_WIDTH - 16 ||
+        player.pos().y() < 10 || player.pos().y() + player.getHitbox().getHeight() > INSTANCE.WINDOW_HEIGHT - 10) {
+      player.move(player.vel().clone().negate());
     }
     
   }
@@ -204,9 +209,13 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     
     INSTANCE.gc().fillRect(0, 0, INSTANCE.WINDOW_WIDTH, INSTANCE.WINDOW_HEIGHT);
     
-    // TODO: Apply depending on room state.
+    // TODO: Different backgrounds?
     INSTANCE.gc().drawImage(Backgrounds.DEFAULT, 0, 0);
-    INSTANCE.gc().drawImage(Backgrounds.BLOCKED, 0, 0);
+    // Red border
+    INSTANCE.gc().fillRect(0, 0, 10, 540);
+    INSTANCE.gc().fillRect(10, 0, 950, 10);
+    INSTANCE.gc().fillRect(950, 10, 10, 530);
+    INSTANCE.gc().fillRect(10, 530, 940, 10);
     
     PlayableCharacter player = INSTANCE.getRun().getPlayer();
     
@@ -245,10 +254,16 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     
     // Render HUD.
     INSTANCE.gc().drawImage(HUDSprites.HUD_BASE, 3, 3);
-    // Render health and mana bar depending on amount remaining.
+    // Render health depending on amount remaining.
     INSTANCE.gc().drawImage(HUDSprites.HUD_HEALTH, 0, 0, 127, 11, 66, 24, (int) Math.round(127d / (100d / INSTANCE.getRun().getPlayer().getHealth())), 11);
     Weapon weapon = INSTANCE.getRun().getPlayer().getWeapon();
-    INSTANCE.gc().drawImage(HUDSprites.HUD_MANA, 0, 0, 123, 6, 66, 40, (int) Math.round(123d / (100d / weapon.getMana())), 6);
+    // Render ability charge progress.
+    if (player.getAbilA() != null) {
+      INSTANCE.gc().drawImage(HUDSprites.HUD_MANA_A, 0, 0, 58, 6, 66, 40, 58d * (player.getAbilA().getRequired() / player.getAbilA().getCharge()), 6);
+    }
+    if (player.getAbilB() != null) {
+      INSTANCE.gc().drawImage(HUDSprites.HUD_MANA_B, 0, 0, 65, 6, 124, 40, 65d * (player.getAbilB().getRequired() / player.getAbilB().getCharge()), 6);
+    }
     
     // Render weapon sprite in HUD.
     INSTANCE.gc().drawImage(weapon.getHudSprite(), 10 + weapon.getHudOffset().x(), 10 + weapon.getHudOffset().y());

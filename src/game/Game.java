@@ -38,7 +38,7 @@ public final class Game extends Application {
       Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
       GraphicsContext gc = canvas.getGraphicsContext2D();
       setGc(gc);
-      gc().setFill(Color.WHITE);
+      gc().setFill(Color.RED);
       gc().setStroke(Color.RED);
       gc().setLineWidth(2.0);
       Scene scene = new Scene(new Group(canvas));

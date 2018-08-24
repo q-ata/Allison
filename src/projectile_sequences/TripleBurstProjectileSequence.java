@@ -3,33 +3,27 @@ package projectile_sequences;
 import game.Game;
 import game.ProjectileSequence;
 import game.structures.Projectile;
+import game.structures.Scheduler;
 
 public class TripleBurstProjectileSequence implements ProjectileSequence {
   
   private int counter = 0;
-  private int generated = 1;
   
   @Override
   public void generate(Projectile proj, Game instance) {
-    proj.setSolid(false);
     instance.getRun().getPlayer().setWeaponCooldown(1);
     instance.getRun().getCurrentRoom().getItems().addProj(proj);
-    instance.getRun().addScheduler(new Runnable() {
+    Scheduler.create(new Runnable() {
       @Override
       public void run() {
         if (++counter == 10) {
           counter = 0;
           Projectile projec = locate(proj.dir(), instance, instance.getRun().getPlayer().getWeapon().getData());
-          projec.setSolid(false);
           instance.getRun().getPlayer().setWeaponCooldown(1);
           instance.getRun().getCurrentRoom().getItems().addProj(projec);
-          if (++generated == 3) {
-            instance.getRun().removeScheduler(this);
-            generated = 1;
-          }
         }
       }
-    });
+    }, 20, instance.getRun());
     
   }
 

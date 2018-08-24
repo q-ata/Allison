@@ -7,6 +7,7 @@ import engine.Vec2;
 import game.blocks.RoomTransitioner;
 import game.blocks.RoomTransitionerX;
 import game.blocks.RoomTransitionerY;
+import game.structures.Scheduler;
 
 public class Run {
   
@@ -23,8 +24,8 @@ public class Run {
   private Vec2 currentPos;
   private int floor = 0;
   
-  private List<Runnable> schedulers = new ArrayList<Runnable>();
-  private List<Runnable> toRemove = new ArrayList<Runnable>();
+  private List<Scheduler> schedulers = new ArrayList<Scheduler>();
+  private List<Scheduler> toRemove = new ArrayList<Scheduler>();
   
   private LevelGenerator generator = new LevelGenerator();
 
@@ -38,19 +39,20 @@ public class Run {
     // TODO: Procedurally generate levels.
   }
   
-  public void addScheduler(Runnable runnable) {
-    schedulers.add(runnable);
+  public int addScheduler(Scheduler s) {
+    schedulers.add(s);
+    return schedulers.size();
   }
   
-  public void removeScheduler(Runnable runnable) {
-    toRemove.add(runnable);
+  public void removeScheduler(Scheduler s) {
+    toRemove.add(s);
   }
   
-  public List<Runnable> getSchedulers() {
+  public List<Scheduler> getSchedulers() {
     return schedulers;
   }
   
-  public List<Runnable> toRemove() {
+  public List<Scheduler> toRemove() {
     return toRemove;
   }
   
@@ -83,7 +85,7 @@ public class Run {
     if (!room.isCleared()) {
       RoomTransitioner.setAllOpen(false, room);
     }
-    getPlayer().move(new Vec2(453, 239).sub(getPlayer().pos()));
+    getPlayer().move(new Vec2(12, 409).sub(getPlayer().pos()));
     instance.tui().updateMinimap();
     if (room.getRts().size() != 0) {
       return;
@@ -112,6 +114,10 @@ public class Run {
     }
     for (RoomTransitioner rt : room.getRts()) {
       room.getItems().addBlock(rt);
+    }
+    if (room.getItems().entities().size() == 0 && !room.isCleared()) {
+      room.setCleared(true);
+      RoomTransitioner.setAllOpen(true, room);
     }
   }
 

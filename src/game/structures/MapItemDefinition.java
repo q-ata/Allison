@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import engine.Vec2;
 import game.MapItemData;
 
+// MapItem factory.
 public class MapItemDefinition {
   
   private String name;

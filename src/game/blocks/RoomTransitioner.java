@@ -16,7 +16,7 @@ public abstract class RoomTransitioner extends MapItem {
   private Vec2 transitionTo;
   private static final String prefix = "file:resources/blocks/room_transitioner/";
   static final AnimationSequence lropen = new AnimationSequence(new Image[] {new Image(prefix + "portal_leftright.png")});
-  static AnimationSequence udopen = new AnimationSequence(new Image[] {new Image(prefix + "portal_updown.png")});;
+  static AnimationSequence udopen = new AnimationSequence(new Image[] {new Image(prefix + "portal_updown.png")});
   private boolean updown;
 
   public RoomTransitioner(Vec2 pos, Vec2 transitionTo, boolean updown) {

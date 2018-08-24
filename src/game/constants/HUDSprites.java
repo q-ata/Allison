@@ -18,7 +18,8 @@ public final class HUDSprites {
   
   public static final Image HUD_BASE = new Image("file:resources/misc/hud.png");
   public static final Image HUD_HEALTH = new Image("file:resources/misc/full_health.png");
-  public static final Image HUD_MANA = new Image("file:resources/misc/full_mana.png");
+  public static final Image HUD_MANA_A = new Image("file:resources/misc/mana_a.png");
+  public static final Image HUD_MANA_B = new Image("file:resources/misc/mana_b.png");
   
   private static final java.awt.Image populateMinimapTile() {
     try {

@@ -5,8 +5,6 @@ import javafx.scene.image.Image;
 
 public abstract class Weapon {
   
-  // Progress towards being able to use weapon ability.
-  private int mana = 100;
   // Sprite to use for HUD.
   private Image hudSprite;
   // How much to offset when displaying in HUD.
@@ -24,14 +22,6 @@ public abstract class Weapon {
     setHudOffset(DataLoader.loadHudWeaponSpriteOffset(hudSpriteOffset));
     setSequence(sequence);
     setData(DataLoader.loadProjectileData(dataPath));
-  }
-
-  public int getMana() {
-    return mana;
-  }
-
-  public void setMana(int mana) {
-    this.mana = mana;
   }
 
   public Image getHudSprite() {

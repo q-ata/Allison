@@ -7,7 +7,6 @@ import game.AnimationSequence;
 import game.DataLoader;
 import game.Run;
 import game.constants.Direction;
-import game.schedulers.RemoveInvincibility;
 
 public abstract class Entity extends MapItem implements AI {
   
@@ -48,7 +47,15 @@ public abstract class Entity extends MapItem implements AI {
     }
     if (getResistance() != 0) {
       setResistance(0);
-      run.addScheduler(new RemoveInvincibility(invincible, this, run));
+      Scheduler s = new Scheduler(invincible, run) {
+        @Override
+        public void run() {
+          if (counter + 1 == invincible) {
+            setResistance(getBaseResistance());
+          }
+        }
+      };
+      run.addScheduler(s);
     }
     return false;
   }

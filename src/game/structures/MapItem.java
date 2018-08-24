@@ -105,6 +105,27 @@ public abstract class MapItem implements Collider {
   public Image getCurrentSprite() {
     return getSpriteSet().get(dir()).getSprite();
   }
+  
+  public static Vec2 calculateVelocity(Direction dir, double v) {
+    Vec2 vel;
+    switch (dir) {
+    case UP:
+      vel = new Vec2(0, -v);
+      break;
+    case DOWN:
+      vel = new Vec2(0, v);
+      break;
+    case LEFT:
+      vel = new Vec2(-v, 0);
+      break;
+    case RIGHT:
+      vel = new Vec2(v, 0);
+      break;
+    default:
+      vel = new Vec2();
+    }
+    return vel;
+  }
 
   public HashMap<Direction, AnimationSequence> getSpriteSet() {
     return spriteSet;

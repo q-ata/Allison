@@ -12,7 +12,7 @@ public class ProjectileData {
   // range multiplier.
   // size increase.
   // size multiplier.
-  // TODO: All stats besides size are not being used.
+  // TODO: All stats besides size are not being used. Maybe merge this and Stats class into one?
   
   private int rateBoost = 0;
   private double rateMulti = 1.0;

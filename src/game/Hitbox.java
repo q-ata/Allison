@@ -9,6 +9,8 @@ import engine.Vec2;
 public class Hitbox {
   
   private Convex[] shapes;
+  private double width;
+  private double height;
   
   // Create a hitbox by parsing a data file.
   public Hitbox(String path) {
@@ -39,10 +41,13 @@ public class Hitbox {
     }
     
     reader.close();
+    
+    calculateDimensions();
   }
   
   public Hitbox(Convex[] shapes) {
     setShapes(shapes);
+    calculateDimensions();
   }
   
   public void move(Vec2 direction) {
@@ -58,6 +63,31 @@ public class Hitbox {
     }
     center.set(center.x() / getShapes().length, center.y() / getShapes().length);
     return center;
+  }
+  
+  private void calculateDimensions() {
+    double minX = Double.MAX_VALUE;
+    double maxX = -Double.MAX_VALUE;
+    double minY = Double.MAX_VALUE;
+    double maxY = -Double.MAX_VALUE;
+    
+    for (Convex c : getShapes()) {
+      minX = Math.min(minX, c.getFarthestPoint(new Vec2(-1, 0)).x());
+      maxX = Math.max(maxX, c.getFarthestPoint(new Vec2(1, 0)).x());
+      minY = Math.min(minY, c.getFarthestPoint(new Vec2(0, -1)).y());
+      maxY = Math.max(maxY, c.getFarthestPoint(new Vec2(0, 1)).y());
+    }
+    
+    width = maxX - minX;
+    height = maxY - minY;
+  }
+  
+  public double getWidth() {
+    return width;
+  }
+  
+  public double getHeight() {
+    return height;
   }
   
   public Hitbox clone() {

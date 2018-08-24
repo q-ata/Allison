@@ -17,6 +17,7 @@ public class LevelGenerator {
     }
   }
   
+  // Valid characters for seed.
   private final char[] chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toCharArray();
   private final long seed;
   private final Random generator;

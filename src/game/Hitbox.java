@@ -65,6 +65,7 @@ public class Hitbox {
     return center;
   }
   
+  // Calculate the width and height of the combined hitbox.
   private void calculateDimensions() {
     double minX = Double.MAX_VALUE;
     double maxX = -Double.MAX_VALUE;
@@ -78,7 +79,9 @@ public class Hitbox {
       maxY = Math.max(maxY, c.getFarthestPoint(new Vec2(0, 1)).y());
     }
     
+    // (Rightmost point in the hitbox) - (Leftmost point in the hitbox)
     width = maxX - minX;
+    // (Highest point in the hitbox) - (Lowest point in the hitbox)
     height = maxY - minY;
   }
   

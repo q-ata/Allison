@@ -2,6 +2,7 @@ package game;
 
 import engine.Vec2;
 import game.constants.Direction;
+import game.structures.MapItem;
 import game.structures.Projectile;
 
 public interface ProjectileSequence {
@@ -21,23 +22,7 @@ public interface ProjectileSequence {
   }
   
   public default void behaviour(Projectile proj) {
-    switch (proj.dir()) {
-    case UP:
-      proj.move(new Vec2(0, -3));
-      break;
-    case DOWN:
-      proj.move(new Vec2(0, 3));
-      break;
-    case LEFT:
-      proj.move(new Vec2(-3, 0));
-      break;
-    case RIGHT:
-      proj.move(new Vec2(3, 0));
-      break;
-    default:
-      proj.move(new Vec2(0, -3));
-      break;
-    }
+    proj.move(MapItem.calculateVelocity(proj.dir(), 3));
   }
 
 }

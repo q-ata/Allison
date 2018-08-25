@@ -10,7 +10,9 @@ import engine.Shape;
 import engine.Vec2;
 import game.constants.Backgrounds;
 import game.constants.Direction;
+import game.constants.DirectionControl;
 import game.constants.HUDSprites;
+import game.constants.Keybind;
 import game.structures.Entity;
 import game.structures.MapItem;
 import game.structures.Projectile;
@@ -25,6 +27,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
   private final Game INSTANCE;
   private long passed = 0;
   private long prev = System.nanoTime();
+  private int elapsed = 0;
   
   public GameLoop(Game instance) {
     INSTANCE = instance;
@@ -89,35 +92,45 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     }
     INSTANCE.getRun().toRemove().clear();
     
+    // This system allows the user to override movement direction with a new key press even if the old key is still being held.
+    // TODO: Implement this for player projectiles.
     PlayableCharacter main = INSTANCE.getRun().getPlayer();
-    // TODO: Change movement system so any direction can be overridden.
-    boolean up = KeyboardInputs.KEYMAP.get(KeyCode.W);
-    boolean down = KeyboardInputs.KEYMAP.get(KeyCode.S);
-    boolean left = KeyboardInputs.KEYMAP.get(KeyCode.A);
-    boolean right = KeyboardInputs.KEYMAP.get(KeyCode.D);
-    if (up && main.dir() != Direction.UP) {
-      main.setDir(Direction.UP);
+    for (Keybind kb : DirectionControl.KEYBINDS) {
+      boolean active = KeyboardInputs.KEYMAP.get(kb.key);
+      if (!kb.active && active) {
+        kb.last = elapsed;
+        kb.active = true;
+      }
+      else if (kb.active && !active) {
+        kb.active = false;
+      }
+      // Each active Keybind is fed into the binary heap which is emptied at the end of the operation.
+      if (kb.active) {
+        DirectionControl.QUEUE.offer(kb);
+      }
     }
-    else if (down && main.dir() != Direction.DOWN) {
-      main.setDir(Direction.DOWN);
+    
+    // Get the latest direction key pressed and empty the heap.
+    Keybind k = DirectionControl.QUEUE.poll();
+    DirectionControl.QUEUE.clear();
+    // If at least one direction key is active.
+    if (k != null) {
+      if (!main.isMoving() || main.dir() != k.dir) {
+        main.setDir(k.dir);
+        main.getSpriteSet().get(main.dir()).advanceAnimation();
+        main.setMoving(true);
+        Vec2 mov = MapItem.calculateVelocity(main.dir(), main.getMoveSpeed());
+        main.vel().set(mov.x(), mov.y());
+      }
+      return;
     }
-    else if (left && main.dir() != Direction.LEFT) {
-      main.setDir(Direction.LEFT);
-    }
-    else if (right && main.dir() != Direction.RIGHT) {
-      main.setDir(Direction.RIGHT);
-    }
-    if ((up || down || left || right) && !main.isMoving()) {
-      main.getSpriteSet().get(main.dir()).advanceAnimation();
-      main.setMoving(true);
-      Vec2 mov = MapItem.calculateVelocity(main.dir(), main.getMoveSpeed());
-      main.vel().set(mov.x(), mov.y());
-    }
-    else if (!(up || down || left || right)) {
+    // If no direction keys are active.
+    if (main.isMoving()) {
       main.getSpriteSet().get(main.dir()).reset();
       main.setMoving(false);
       main.setVel(new Vec2());
     }
+    
   }
 
   @Override
@@ -280,6 +293,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     input();
     physics();
     render();
+    elapsed++;
     
     // Calculate FPS.
     INSTANCE.setFps(INSTANCE.getFps() + 1);

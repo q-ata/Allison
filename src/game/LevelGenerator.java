@@ -1,6 +1,7 @@
 package game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -40,6 +41,7 @@ public class LevelGenerator {
   }
   
   public Floor generateFloor(int count, PlayableCharacter player) {
+    // Generate an empty 2D list big enough for a completely straight map left or up.
     List<List<Room>> rooms = new ArrayList<List<Room>>(count * 2);
     for (int i = 0; i < count + 2; i++) {
       List<Room> col = new ArrayList<Room>(count * 2);
@@ -56,16 +58,20 @@ public class LevelGenerator {
     pop.add(spawn);
     rooms.get((int) spawn.coord().x()).set((int) spawn.coord().y(), spawn);
     
+    // A list of valid places to generate a new room.
     List<Vec2> valid = new ArrayList<Vec2>();
+    // Adding tiles adjacent to spawn.
     valid.add(new Vec2(spawn.coord().x(), spawn.coord().y() - 1));
     valid.add(new Vec2(spawn.coord().x(), spawn.coord().y() + 1));
     valid.add(new Vec2(spawn.coord().x() - 1, spawn.coord().y()));
     valid.add(new Vec2(spawn.coord().x() + 1, spawn.coord().y()));
     
+    // Adds a new room on each iteration.
     for (int q = 0; q < count - 1; q++) {
       
       for (int i = 0; i < valid.size(); i++) {
         Vec2 coord = valid.get(i);
+        // If a tile already has too many generated rooms adjacent to it, remove from list.
         if (tooMany(coord, rooms)) {
           valid.remove(i--);
         }
@@ -91,6 +97,7 @@ public class LevelGenerator {
       }
       Room n = DataLoader.loadRoom(id, c, player);
       
+      // Add empty tiles adjacent to the new room to the list of valid tiles.
       Vec2 up = new Vec2(c.x(), c.y() - 1);
       Vec2 down = new Vec2(c.x(), c.y() + 1);
       Vec2 left = new Vec2(c.x() - 1, c.y());
@@ -107,11 +114,9 @@ public class LevelGenerator {
       if (rooms.get((int) right.x()).get((int) right.y()) == null) {
         valid.add(right);
       }
+      // Pad with another column or row if running out of space.
       if (rooms.size() < c.x() + 3) {
-        List<Room> list = new ArrayList<Room>();
-        for (int i = 0; i < rooms.get(0).size(); i++) {
-          list.add(null);
-        }
+        List<Room> list = new ArrayList<Room>(Collections.nCopies(rooms.get(0).size(), null));
         rooms.add(list);
       }
       if (rooms.get(0).size() < c.y() + 3) {
@@ -123,6 +128,8 @@ public class LevelGenerator {
       
     }
     
+    // Remove empty rows and columns after the floor is finished generating.
+    // Start with left and up side, keep track of how many are removed.
     int xShift = 0;
     boolean empty = true;
     for (int i = 0; i < rooms.size(); i++) {
@@ -162,6 +169,7 @@ public class LevelGenerator {
       }
     }
     
+    // Right and down.
     empty = true;
     for (int i = rooms.size() - 1; i > -1; i--) {
       for (int j = 0; j < rooms.get(0).size(); j++) {
@@ -196,6 +204,7 @@ public class LevelGenerator {
       }
     }
     
+    // Adjust coordinates of remaining rooms accordingly.
     for (int i = 0; i < rooms.size(); i++) {
       for (int j = 0; j < rooms.get(0).size(); j++) {
         Room v = rooms.get(i).get(j);
@@ -205,6 +214,7 @@ public class LevelGenerator {
       }
     }
     
+    // Convert 2D list to 2D array.
     Room[][] layout = new Room[rooms.size()][rooms.get(0).size()];
     for (int i = 0; i < layout.length; i++) {
       layout[i] = rooms.get(i).toArray(new Room[rooms.get(i).size()]);
@@ -213,6 +223,7 @@ public class LevelGenerator {
     
   }
   
+  // Checks if any adjacent tiles already have a room.
   private static boolean tooMany(Vec2 c, List<List<Room>> rooms) {
     int a = 0;
     if (rooms.get((int) c.x()).get((int) (c.y() - 1)) != null) {

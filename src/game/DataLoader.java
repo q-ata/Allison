@@ -43,7 +43,7 @@ public final class DataLoader {
         sprites[s] = new Image("file:resources/" + reader.readLine() + ".png");
       }
       
-      sequences[d] = sprites.length == 1 ? new AnimationSequence(sprites) : new AnimationSequence(sprites, frameDuration, dir);
+      sequences[d] = sprites.length == 1 ? new AnimationSequence(sprites, dir) : new AnimationSequence(sprites, frameDuration, dir);
     }
     return sequences;
   }
@@ -64,10 +64,11 @@ public final class DataLoader {
     return offset;
   }
   
-  // Reading this method will lose you brain cells.
+  // Load projectile info.
   public static ProjectileData loadProjectileData(String path) {
     
     reader = new DataFileReader(path);
+    // Read stat values.
     int rateBoost = Integer.parseInt(reader.readLine());
     double rateMulti = Double.parseDouble(reader.readLine());
     double speedBoost = Double.parseDouble(reader.readLine());
@@ -79,6 +80,7 @@ public final class DataLoader {
     int scaleBoost = Integer.parseInt(reader.readLine());
     double scaleMulti = Double.parseDouble(reader.readLine());
     
+    // Load sprite and hitbox data for each direction.
     Hitbox upBox = new Hitbox(reader.readLine());
     int upCount = Integer.parseInt(reader.readLine());
     Image[] upSprites = new Image[upCount];
@@ -109,6 +111,7 @@ public final class DataLoader {
     MapItemData leftData = new MapItemData(new AnimationSequence(leftSprites, Direction.LEFT), leftBox);
     MapItemData rightData = new MapItemData(new AnimationSequence(rightSprites, Direction.RIGHT), rightBox);
     
+    // Combine all values to form a ProjectileData object.
     return new ProjectileData(rateBoost, rateMulti, speedBoost, speedMulti, damageBoost, damageMulti,
         rangeBoost, rangeMulti, scaleBoost, scaleMulti, new ProjectileSprites(upData, downData, leftData, rightData));
     

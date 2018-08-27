@@ -76,11 +76,22 @@ public class Projectile extends MapItem {
     INSTANCE.getRun().getCurrentRoom().getItems().removeProj(this);
     if (collision instanceof Entity) {
       Entity killable = (Entity) collision;
-      if (killable.takeDamage((int) (proj().damageBoost() * proj().damageMulti()))) {
+      int dmg = (int) (proj().damageBoost() * proj().damageMulti());
+      if (killable.takeDamage(dmg)) {
         INSTANCE.getRun().getCurrentRoom().getItems().removeEntity(killable);
         if (INSTANCE.getRun().getCurrentRoom().getItems().entities().size() == 0) {
           INSTANCE.getRun().getCurrentRoom().setCleared(true);
           RoomTransitioner.setAllOpen(true, INSTANCE.getRun().getCurrentRoom());
+        }
+      }
+      // If it is the player's projectile, increase ability charge.
+      if (getFirer() instanceof PlayableCharacter) {
+        PlayableCharacter player = INSTANCE.getRun().getPlayer();
+        if (player.getAbilA() != null) {
+          player.getAbilA().addCharge(dmg);
+        }
+        if (player.getAbilB() != null) {
+          player.getAbilB().addCharge(dmg);
         }
       }
     }

@@ -21,7 +21,7 @@ public abstract class MapItem implements Collider {
   private static final Map<String, MapItemData> dataMap = populateDataMap();
   
   // Direction : AnimationSequence hashmap for each direction that should be animated.
-  private HashMap<Direction, AnimationSequence> spriteSet = new HashMap<Direction, AnimationSequence>();
+  private Map<Direction, AnimationSequence> spriteSet = new HashMap<Direction, AnimationSequence>();
   private Vec2 pos = new Vec2();
   private Direction dir;
   // Whether the MapItem must be moving in order to be animated.
@@ -127,11 +127,11 @@ public abstract class MapItem implements Collider {
     return vel;
   }
 
-  public HashMap<Direction, AnimationSequence> getSpriteSet() {
+  public Map<Direction, AnimationSequence> getSpriteSet() {
     return spriteSet;
   }
 
-  public void setSpriteSet(HashMap<Direction, AnimationSequence> spriteSet) {
+  public void setSpriteSet(Map<Direction, AnimationSequence> spriteSet) {
     this.spriteSet = spriteSet;
   }
   

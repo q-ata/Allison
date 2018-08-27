@@ -8,12 +8,16 @@ import engine.GameProcess;
 import engine.KeyboardInputs;
 import engine.Shape;
 import engine.Vec2;
+import game.abilities.Blink;
 import game.constants.Backgrounds;
 import game.constants.Direction;
 import game.constants.DirectionControl;
 import game.constants.HUDSprites;
+import game.constants.KeyPressListener;
 import game.constants.Keybind;
+import game.structures.Ability;
 import game.structures.Entity;
+import game.structures.GameOperation;
 import game.structures.MapItem;
 import game.structures.Projectile;
 import game.structures.Scheduler;
@@ -35,9 +39,48 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     player.setWeapon(new TestWeapon(INSTANCE));
     INSTANCE.setRun(new Run(System.nanoTime(), INSTANCE, player));
     INSTANCE.getRun().setCurrentRoom(INSTANCE.getRun().getCurrentPos());
+    KeyPressListener.init(INSTANCE);
+    // Set keybinds for ability A, ability B and swap ability slots.
+    KeyPressListener.register(KeyCode.E, new GameOperation() {
+      @Override
+      public void run(Game instance) {
+        PlayableCharacter player = instance.getRun().getPlayer();
+        Ability ability = player.getAbilA();
+        if (ability == null || ability.getCharge() < ability.getReq()) {
+          return;
+        }
+        ability.addCharge(-ability.getReq());
+        ability.precast(instance);
+        ability.setActive(true);
+      }
+    });
+    KeyPressListener.register(KeyCode.R, new GameOperation() {
+      @Override
+      public void run(Game instance) {
+        PlayableCharacter player = instance.getRun().getPlayer();
+        Ability ability = player.getAbilB();
+        if (ability == null || ability.getCharge() < ability.getReq()) {
+          return;
+        }
+        ability.addCharge(-ability.getReq());
+        ability.precast(instance);
+        ability.setActive(true);
+      }
+    });
+    KeyPressListener.register(KeyCode.Q, new GameOperation() {
+      @Override
+      public void run(Game instance) {
+        PlayableCharacter player = instance.getRun().getPlayer();
+        Ability a = player.getAbilA();
+        player.setAbilA(player.getAbilB());
+        player.setAbilB(a);
+      }
+    });
     
-    // Assign audio index and use when firing (in method: handleProjectileInput).
+    // TODO: Assign audio index and use when firing (in method: handleProjectileInput).
     INSTANCE.getAudio().register("resources/weapons/test_weapon/shot/effect");
+    
+    player.setAbilA(new Blink(INSTANCE));
   }
   
   private void handleProjectileInput() {
@@ -92,6 +135,8 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     }
     INSTANCE.getRun().toRemove().clear();
     
+    KeyPressListener.handle();
+    
     // This system allows the user to override movement direction with a new key press even if the old key is still being held.
     // TODO: Implement this for player projectiles.
     PlayableCharacter main = INSTANCE.getRun().getPlayer();
@@ -115,7 +160,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     DirectionControl.QUEUE.clear();
     // If at least one direction key is active.
     if (k != null) {
-      if (!main.isMoving() || main.dir() != k.dir) {
+      if (!main.isMoving() || main.dir() != k.dir || main.getMoveSpeed() != Math.abs(main.vel().sum())) {
         main.setDir(k.dir);
         main.getSpriteSet().get(main.dir()).advanceAnimation();
         main.setMoving(true);
@@ -143,7 +188,13 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     if (player.vel().sum() != 0.0) {
       player.move(player.vel());
     }
-    //System.out.println(player.pos());
+    
+    if (player.getAbilA() != null && player.getAbilA().isActive()) {
+      player.getAbilA().cast(INSTANCE);
+    }
+    if (player.getAbilB() != null && player.getAbilB().isActive()) {
+      player.getAbilB().cast(INSTANCE);
+    }
     
     List<MapItem> all = INSTANCE.getRun().getCurrentRoom().getItems().all();
     
@@ -216,7 +267,6 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     }
   }
 
-  // TODO: Use MapItemStore
   @Override
   public void render() {
     
@@ -272,10 +322,10 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     Weapon weapon = INSTANCE.getRun().getPlayer().getWeapon();
     // Render ability charge progress.
     if (player.getAbilA() != null) {
-      INSTANCE.gc().drawImage(HUDSprites.HUD_MANA_A, 0, 0, 58, 6, 66, 40, 58d * (player.getAbilA().getRequired() / player.getAbilA().getCharge()), 6);
+      INSTANCE.gc().drawImage(HUDSprites.HUD_MANA_A, 0, 0, 58, 6, 66, 40, 58d * (player.getAbilA().getCharge() / player.getAbilA().getMax()), 6);
     }
     if (player.getAbilB() != null) {
-      INSTANCE.gc().drawImage(HUDSprites.HUD_MANA_B, 0, 0, 65, 6, 124, 40, 65d * (player.getAbilB().getRequired() / player.getAbilB().getCharge()), 6);
+      INSTANCE.gc().drawImage(HUDSprites.HUD_MANA_B, 0, 0, 65, 6, 124, 40, 65d * (player.getAbilB().getCharge() / player.getAbilB().getMax()), 6);
     }
     
     // Render weapon sprite in HUD.

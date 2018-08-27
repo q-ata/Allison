@@ -53,6 +53,9 @@ public class AnimationSequence {
   
   // Change the sprite to the next one in the animation.
   public void advanceAnimation() {
+    if (getSprites().length == 1) {
+      return;
+    }
     currentFrame += increase ? 1 : -1;
     if (currentFrame == getSprites().length) {
       increase = false;

@@ -2,7 +2,7 @@ package game.weapons;
 
 import game.Game;
 import game.Weapon;
-import projectile_sequences.StraightProjectileSequence;
+import game.projectile_sequences.StraightProjectileSequence;
 
 public class TestWeapon extends Weapon {
 

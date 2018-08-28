@@ -26,7 +26,7 @@ public class DefenseMatrixAbility extends Ability {
   private int currentUse = 0;
   
   public DefenseMatrixAbility(Game instance) {
-    super(180, 36);
+    super(180, 1);
     // TODO: These values probably need to be polished.
     // Map defense matrix direction to Direction enum and position shift.
     SHIFT_MAP.put(Direction.UP, new Vec2(4, 24));
@@ -42,7 +42,7 @@ public class DefenseMatrixAbility extends Ability {
   
   @Override
   public void precast(Game instance) {
-    addCharge(MIN_THRESHOLD);
+    addCharge(1);
     if (isActive()) {
       return;
     }

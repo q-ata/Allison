@@ -86,6 +86,7 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     player.setAbilA(new Blink(INSTANCE));
     player.setAbilB(new DefenseMatrixAbility(INSTANCE));
     player.getAbilB().setBind(KeyCode.R);
+    player.getAbilB().setCharge(10);
     
   }
   

@@ -1,4 +1,4 @@
-package projectile_sequences;
+package game.projectile_sequences;
 
 import game.Game;
 import game.ProjectileSequence;

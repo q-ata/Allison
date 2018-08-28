@@ -9,6 +9,7 @@ import engine.KeyboardInputs;
 import engine.Shape;
 import engine.Vec2;
 import game.abilities.Blink;
+import game.abilities.DefenseMatrixAbility;
 import game.constants.Backgrounds;
 import game.constants.Direction;
 import game.constants.DirectionControl;
@@ -74,6 +75,8 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
         Ability a = player.getAbilA();
         player.setAbilA(player.getAbilB());
         player.setAbilB(a);
+        player.getAbilA().setBind(KeyCode.E);
+        player.getAbilB().setBind(KeyCode.R);
       }
     });
     
@@ -81,6 +84,9 @@ public class GameLoop implements GameProcess, EventHandler<ActionEvent> {
     INSTANCE.getAudio().register("resources/weapons/test_weapon/shot/effect");
     
     player.setAbilA(new Blink(INSTANCE));
+    player.setAbilB(new DefenseMatrixAbility(INSTANCE));
+    player.getAbilB().setBind(KeyCode.R);
+    
   }
   
   private void handleProjectileInput() {

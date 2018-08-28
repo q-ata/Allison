@@ -1,6 +1,7 @@
 package game.structures;
 
 import game.Game;
+import javafx.scene.input.KeyCode;
 
 public abstract class Ability implements AbilityCast {
   
@@ -9,6 +10,8 @@ public abstract class Ability implements AbilityCast {
   private double charge = 0;
   
   private boolean active = false;
+  
+  private KeyCode bind = KeyCode.E;
   
   public Ability(double max, double req) {
     MAX = max;
@@ -49,6 +52,14 @@ public abstract class Ability implements AbilityCast {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  public KeyCode getBind() {
+    return bind;
+  }
+
+  public void setBind(KeyCode bind) {
+    this.bind = bind;
   }
 
 }

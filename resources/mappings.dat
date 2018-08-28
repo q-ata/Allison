@@ -1,4 +1,4 @@
-5
+9
 PlayableCharacter
 game.PlayableCharacter
 characters/main/build
@@ -14,3 +14,15 @@ blocks/room_transitioner/buildx
 RoomTransitionerY
 game.blocks.RoomTransitionerY
 blocks/room_transitioner/buildy
+DefenseMatrixUp
+game.blocks.DefenseMatrixUp
+ability/defense_matrix/shield_up_build
+DefenseMatrixDown
+game.blocks.DefenseMatrixDown
+ability/defense_matrix/shield_down_build
+DefenseMatrixLeft
+game.blocks.DefenseMatrixLeft
+ability/defense_matrix/shield_left_build
+DefenseMatrixRight
+game.blocks.DefenseMatrixRight
+ability/defense_matrix/shield_right_build
